@@ -23,11 +23,9 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 .search input::placeholder{color:#9ca3af}
 .search>span{position:absolute;left:14px;top:9px;color:#9ca3af;font-size:20px}
 .gresults{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:8px;display:none;z-index:30}
-.gresults{max-height:430px;overflow-y:auto}
 .gresults .gr-total{font-size:12px;color:#6b7280;padding:5px 12px 8px;border-bottom:1px solid #f1f5f9;margin-bottom:6px}
-.gresults .gr-item{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gresults .gr-item{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:#374151}
 .gresults .gr-item:hover{background:#f0fdf4;color:#16a34a}
-mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weight:600}
 .wrap{max-width:1400px;margin:auto;padding:24px;display:grid;grid-template-columns:220px 1fr 330px;gap:20px}
 .panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.08)}
 .side,.right{padding:16px;height:max-content;position:sticky;top:86px}
@@ -1107,51 +1105,12 @@ function haystack(t){
   return ((t.dataset.k||'')+' '+(sum?sum.innerText:'')+' '+(body?body.innerText:'')).toLowerCase();
 }
 
-/* 关键词高亮工具：把匹配词用 mark.hl 包起来（绿底白字），清空时还原 */
-function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
-function clearHl(root){
-  (root||document).querySelectorAll('mark.hl').forEach(m=>{
-    const p=m.parentNode;
-    p.replaceChild(document.createTextNode(m.textContent),m);
-    p.normalize();
-  });
-}
-function highlightIn(el,kw){
-  if(!kw||!el)return;
-  const rx=new RegExp(escRe(kw),'gi');
-  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{
-    acceptNode(n){
-      const p=n.parentNode;
-      if(p&&p.closest&&p.closest('mark.hl,script,style,textarea,input,button,select,.rev-ops,.mk,.extra-del'))return NodeFilter.FILTER_REJECT;
-      return NodeFilter.FILTER_ACCEPT;
-    }
-  });
-  const nodes=[];let n;
-  while((n=walker.nextNode()))nodes.push(n);
-  nodes.forEach(tn=>{
-    const txt=tn.nodeValue;if(!txt)return;
-    rx.lastIndex=0;
-    if(!rx.test(txt))return;
-    rx.lastIndex=0;
-    const frag=document.createDocumentFragment();let last=0,m;
-    while((m=rx.exec(txt))){
-      if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
-      const mk=document.createElement('mark');mk.className='hl';mk.textContent=m[0];
-      frag.appendChild(mk);last=m.index+m[0].length;
-    }
-    if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));
-    tn.parentNode.replaceChild(frag,tn);
-  });
-}
-
 function showWeek(id,reset){
   pages.forEach(p=>p.style.display=(p.id===id)?'block':'none');
   links.forEach(a=>a.classList.toggle('active',a.dataset.page===id));
   current=id;
   if(reset){
     gq.value='';gres.style.display='none';gempty.style.display='none';
-    clearHl(document.body);
-    document.querySelectorAll('.ls').forEach(i=>i.value='');
     topics.forEach(t=>t.style.display='');
   }
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1159,52 +1118,31 @@ function showWeek(id,reset){
 
 links.forEach(a=>a.onclick=e=>{e.preventDefault();showWeek(a.dataset.page,true);});
 
-/* 全局搜索：精准匹配知识点 + 关键词高亮 + 点击直达 */
+/* 全局搜索：搜所有内容 */
 gq.oninput=()=>{
   const s=gq.value.trim().toLowerCase();
-  clearHl(document.body);
-  if(!s){gres.style.display='none';gempty.style.display='none';topics.forEach(t=>{t.style.display='';t.open=false;});gq._hits=[];return;}
-  const hits=[];
+  if(!s){gres.style.display='none';gempty.style.display='none';topics.forEach(t=>t.style.display='');return;}
+  const counts={};
   topics.forEach(t=>{
     const hit=haystack(t).includes(s);
     t.style.display=hit?'block':'none';
-    if(hit){t.open=true;highlightIn(t,s);hits.push(t);}
+    if(hit){t.open=true;const w=t.dataset.wk||'week1';counts[w]=(counts[w]||0)+1;}
   });
-  const counts={};
-  hits.forEach(t=>{const w=t.dataset.wk||'week1';counts[w]=(counts[w]||0)+1;});
   const ids=Object.keys(counts);
-  if(!ids.length){gempty.style.display='block';gres.style.display='none';gq._hits=[];return;}
+  if(!ids.length){gempty.style.display='block';gres.style.display='none';return;}
   gempty.style.display='none';
   if(!counts[current])showWeek(ids[0],false);
-  const items=hits.slice(0,20).map(t=>{
-    const w=t.dataset.wk||'week1';
-    const el=document.querySelector('.page-link[data-page="'+w+'"]');
-    const wl=el?el.textContent.trim().split('·')[0].trim():w;
-    const st=t.querySelector('.sum-txt');
-    const title=(st?st.textContent:'').trim();
-    return '<div class="gr-item" data-i="'+hits.indexOf(t)+'" data-w="'+w+'" title="点击直达：'+title+'">'
-      +'<b style="color:#16a34a">'+wl+'</b> · '+title+'</div>';
+  const items=ids.map(id=>{
+    const el=document.querySelector('.page-link[data-page="'+id+'"]');
+    const label=el?el.textContent.trim():id;
+    return '<div class="gr-item" data-w="'+id+'">'+label+' <span style="color:#16a34a;font-weight:700">（'+counts[id]+' 条）</span></div>';
   }).join('');
-  gres.innerHTML='<div class="gr-total">共 '+hits.length+' 条精准匹配，点击直达知识点：</div>'+items
-    +(hits.length>20?'<div class="gr-total">…还有 '+hits.length+' 条未显示，请继续输入更精确的关键词</div>':'');
+  gres.innerHTML='<div class="gr-total">共 '+ids.reduce((a,b)=>a+counts[b],0)+' 条匹配，点击跳转：</div>'+items;
   gres.style.display='block';
-  gq._hits=hits;
 };
 gres.onclick=e=>{
   const it=e.target.closest('.gr-item');
-  if(!it)return;
-  const w=it.dataset.w,idx=+it.dataset.i||0;
-  const hits=gq._hits||[];
-  const target=hits[idx];
-  showWeek(w,false);
-  if(target){
-    clearHl(document.body);
-    target.open=true;
-    highlightIn(target,gq.value.trim());
-    setTimeout(()=>{target.scrollIntoView({behavior:'smooth',block:'start'});},60);
-  }
-  gres.style.display='none';
-  gq._hits=[];
+  if(it){showWeek(it.dataset.w,false);gres.style.display='none';}
 };
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))gres.style.display='none';});
 
@@ -1216,11 +1154,11 @@ pages.forEach(pg=>{
     input.oninput=()=>{
       const s=input.value.trim().toLowerCase();
       let n=0;
-      pg.querySelectorAll('.topic').forEach(t=>clearHl(t));
       pg.querySelectorAll('.topic').forEach(t=>{
         const hit=!s||haystack(t).includes(s);
         t.style.display=hit?'block':'none';
-        if(hit){n++;if(s){t.open=true;highlightIn(t,s);}}
+        if(hit)n++;
+        if(s&&hit)t.open=true;
       });
       if(box)box.style.display=(s&&!n)?'block':'none';
     };
