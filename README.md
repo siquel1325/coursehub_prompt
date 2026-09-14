@@ -57,11 +57,7 @@
 3. 粘贴给任何 AI，同时附上你的 PPT / 课程大纲
 4. 同样能得到完整网站
 
-<<<<<<< HEAD
 ## 每周课堂新内容（新PPT/笔记）怎么更新？
-=======
-## 怎么更新新内容？
->>>>>>> 88324b7 (Generalize timeline/units: auto-infer Week/Lecture/Unit/Chapter from PPT title instead of hardcoding Week)
 
 每次有了新内容（新的一周 / 新的 Lecture / 新的 Unit / 新的 Chapter……），把新 PPT 发给 AI，
 说一句：「**更新到最新一单元**」（也可以直接说「更新到 Lecture 3」「更新到 Unit 2」）
