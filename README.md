@@ -32,7 +32,7 @@
 
 | 使用方式 | 适合的 AI |
 |---|---|
-| **安装 Skill（推荐）** | 支持 Skill 机制的 AI：**豆包**（本仓库作者正在用）、**Claude Code / Claude Desktop**、**Cursor**，以及任何遵循 `SKILL.md` 目录约定的 AI 工具 |
+| **安装 Skill（推荐）** | 支持 Skill 机制的 AI：**豆包**、**Claude Code / Claude Desktop**、**Cursor**，以及任何遵循 `SKILL.md` 目录约定的 AI 工具 |
 | **复制提示词（零安装）** | 所有其他 AI：**ChatGPT / Gemini / Kimi / 文心一言**……打开 `references/main-prompt.md` 整段复制给它即可 |
 
 两种方式生成的效果完全一样，选哪种都行。
