@@ -1,5 +1,9 @@
 # 部署与跨设备同步（Cloudflare，免费）
 
+> ⚠ 动手部署前，先问使用者：「需要我帮你免费部署上线、并开启跨设备同步吗？」
+> 需要 → 按下面「跨设备同步版」执行；不需要 → 告知「纯本地文件，数据只在当前浏览器
+> localStorage，换设备/浏览器不同步」，不需要执行本文件。
+
 ## 一、纯静态版（几分钟上线，无跨设备同步）
 
 1. 登录 dash.cloudflare.com → Workers & Pages → Create application → **Upload your static files**。
