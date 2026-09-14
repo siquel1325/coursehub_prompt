@@ -1,0 +1,1612 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>COM5104 Study Hub</title>
+<style>*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#1f2937;font-family:Arial,"Microsoft YaHei",sans-serif;min-height:100vh}
+::selection{background:#d1fae5;color:#065f46}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:#e2e8f0}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-filter:blur(8px);border-bottom:1px solid #1e293b;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.head{max-width:1400px;margin:auto;padding:14px 22px;display:flex;gap:18px;align-items:center}
+.logo{font-weight:800;font-size:20px;white-space:nowrap;color:#f8fafc;letter-spacing:.3px}
+.logo i{color:#22c55e;font-style:normal}
+.brand{display:flex;flex-direction:column;justify-content:center;line-height:1.2}
+.course-title{font-size:11.5px;color:#94a3b8;white-space:nowrap;margin-top:2px;font-weight:600}
+.search{flex:1;position:relative}
+.search input{width:100%;padding:12px 16px 12px 40px;border:1px solid #e5e7eb;border-radius:12px;font-size:15px;background:#fff;color:#1f2937;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.search input:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+.search input::placeholder{color:#9ca3af}
+.search>span{position:absolute;left:14px;top:9px;color:#9ca3af;font-size:20px}
+.gresults{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:8px;display:none;z-index:30}
+.gresults .gr-total{font-size:12px;color:#6b7280;padding:5px 12px 8px;border-bottom:1px solid #f1f5f9;margin-bottom:6px}
+.gresults .gr-item{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:#374151}
+.gresults .gr-item:hover{background:#f0fdf4;color:#16a34a}
+.wrap{max-width:1400px;margin:auto;padding:24px;display:grid;grid-template-columns:220px 1fr 330px;gap:20px}
+.panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.08)}
+.side,.right{padding:16px;height:max-content;position:sticky;top:86px}
+.side>b{display:block;color:#6b7280;font-size:12px;letter-spacing:.6px;margin-bottom:6px}
+.side a{display:block;padding:10px 12px;margin:3px 0;border-radius:10px;text-decoration:none;color:#4b5563;font-weight:600;cursor:pointer;transition:background .15s,color .15s}
+.side a:hover,.side a.active{background:#f0fdf4;color:#16a34a}
+.side .wk-no{color:#22c55e;font-weight:800}
+.side-group{margin:6px 0 2px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff}
+.side-group>summary{cursor:pointer;list-style:none;padding:10px 12px;font-weight:750;font-size:13px;color:#1f2937;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.side-group>summary::-webkit-details-marker{display:none}
+.side-group>summary:after{content:"＋";color:#9ca3af;font-weight:400}
+.side-group[open]>summary:after{content:"－"}
+.side-group .page-link{border-radius:0;margin:0;padding-left:26px;border-top:1px solid #f3f4f6}
+.main-top{display:flex;justify-content:flex-end;margin-bottom:10px}
+/* ===== 使用说明 icon（悬停弹出） ===== */
+.help{position:relative;flex:none;cursor:help}
+.help-ic{display:flex;width:28px;height:28px;border:2px solid #22c55e;color:#16a34a;border-radius:50%;align-items:center;justify-content:center;font-weight:800;font-size:14px;background:#fff;transition:background .15s}
+.help:hover .help-ic,.help.open .help-ic{background:#f0fdf4}
+.help-tip{position:absolute;top:calc(100% + 10px);right:0;width:360px;max-width:calc(100vw - 40px);background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:14px 16px;font-size:13px;line-height:1.85;color:#374151;display:none;z-index:40;text-align:left}
+.help:hover .help-tip,.help.open .help-tip{display:block}
+.help-tip b{color:#065f46}
+.help-tip .term{color:#16a34a;font-weight:700}
+/* ===== 周页面 ===== */
+.week-page{display:none;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.week-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;padding:16px 20px;background:linear-gradient(135deg,#111827,#1e293b);border-radius:14px}
+.week-head h2{margin:0;color:#fff;font-size:22px;letter-spacing:.3px}
+.week-head .sub{margin:4px 0 0;color:#94a3b8;font-size:14px}
+.wk-count{display:inline-block;background:rgba(34,197,94,.15);color:#4ade80;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;margin-left:8px;vertical-align:2px}
+.wk-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.toggle-all{background:#fff;color:#16a34a;border:1.5px solid #22c55e;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.toggle-all:hover{background:#f0fdf4}
+.local-search{position:relative}
+.local-search input{width:280px;padding:10px 14px 10px 34px;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;background:#fff;color:#1f2937}
+.local-search input:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}
+.local-search input::placeholder{color:#9ca3af}
+.local-search span{position:absolute;left:12px;top:9px;color:#9ca3af;font-size:15px}
+/* ===== 知识点卡片 ===== */
+.topic{margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
+.topic:hover{box-shadow:0 2px 8px rgba(15,23,42,.06)}
+.topic summary{cursor:pointer;padding:15px 17px;font-weight:750;list-style:none;display:flex;align-items:center;gap:10px;color:#111827}
+.topic summary::-webkit-details-marker{display:none}
+.topic summary .sum-txt{flex:1}
+.mk{flex:none;color:#9ca3af;font-weight:400}
+.mk::before{content:"＋"}
+.topic[open] .mk::before{content:"－"}
+.body{padding:0 17px 17px;border-top:1px solid #f1f5f9;line-height:1.7;color:#374151}
+.body ul,.body ol{margin:8px 0;padding-left:22px}
+.body li{margin:3px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{border:1px solid #e5e7eb;border-radius:10px;padding:11px;color:#374151}
+.box b{color:#111827}
+/* ===== 内容层级配色（唯一点缀色=绿色） ===== */
+.term{color:#16a34a;font-weight:700}
+.key-point{color:#111827;font-weight:700}
+.example{background:#f9fafb;border-left:3px solid #d1d5db;padding:10px 14px;margin:10px 0;border-radius:0 8px 8px 0;color:#4b5563;font-size:14.5px}
+.example b{color:#374151}
+.tip{background:#f0fdf4;border-left:3px solid #22c55e;padding:10px 14px;margin:10px 0;border-radius:0 8px 8px 0;color:#047857;font-size:14.5px}
+/* ===== 复习清单：勾选框 + 加入按钮 + 已加入状态 ===== */
+.rev-ops{flex:none;display:inline-flex;align-items:center;gap:8px;margin-left:14px;cursor:pointer}
+.rev-chk{display:inline-flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:#6b7280;user-select:none}
+.rev-chk input{width:15px;height:15px;cursor:pointer;accent-color:#22c55e}
+.rev-in{color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap}
+/* ===== Syllabus 板块 ===== */
+.syl{background:#fff;border:1px solid #e5e7eb;border-radius:16px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.08)}
+.syl>summary{cursor:pointer;padding:14px 17px;font-weight:800;color:#111827;list-style:none;font-size:15.5px}
+.syl>summary::-webkit-details-marker{display:none}
+.syl>summary:after{content:"＋";float:right;color:#9ca3af}
+.syl[open]>summary:after{content:"－"}
+.syl-body{padding:0 17px 17px;border-top:1px solid #f1f5f9}
+.syl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.syl-sec{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 13px}
+.syl-sec b{color:#16a34a;font-size:13.5px}
+.syl-sec ul{margin:7px 0 0;padding-left:17px}
+.syl-sec li{font-size:13px;line-height:1.75;color:#374151}
+.dl{color:#16a34a;font-weight:700}
+/* ===== 复习清单页面 ===== */
+.rev-item{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.rev-title{flex:1;font-weight:700;font-size:14.5px;cursor:pointer;color:#111827}
+.rev-title:hover{color:#16a34a;text-decoration:underline}
+.rev-wk{background:#f3f4f6;color:#4b5563;border-radius:999px;padding:3px 10px;font-size:12px;white-space:nowrap}
+.rev-know{background:#fff;color:#16a34a;border:1.5px solid #22c55e;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.rev-know:hover{background:#f0fdf4}
+.rev-item.open{border-color:#86efac;box-shadow:0 0 0 1px #86efac}
+.rev-detail{display:none;flex-basis:100%;margin-top:12px;padding:14px 16px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:14px;line-height:1.75;color:#374151;max-height:420px;overflow-y:auto}
+.rev-detail::-webkit-scrollbar{width:8px}
+.rev-detail::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+.rev-detail p{margin:6px 0}
+/* ===== 课堂笔记 ===== */
+.note-add{display:flex;gap:10px;margin-bottom:16px;align-items:flex-end}
+.note-add textarea{flex:1;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:14px;resize:vertical;min-height:64px;font-family:inherit;color:#1f2937;background:#fff;line-height:1.6}
+.note-add textarea:focus{outline:none;border-color:#22c55e}
+.note-add button{background:#22c55e;color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.note-add button:hover{background:#16a34a}
+.note-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:13px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.note-body{flex:1;font-size:14px;line-height:1.7;color:#374151;white-space:pre-wrap;word-break:break-word}
+.note-time{flex:none;color:#9ca3af;font-size:12px;white-space:nowrap;padding-top:3px}
+.note-del{flex:none;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:2px 6px;border-radius:6px}
+.note-del:hover{color:#ef4444;background:#fef2f2}
+/* ===== 批量加入悬浮条 ===== */
+.bulk-bar{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:50;display:none;align-items:center;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;box-shadow:0 12px 34px rgba(0,0,0,.18);padding:10px 18px;font-size:14px;color:#374151}
+.bulk-bar b{color:#16a34a}
+.bulk-add{background:#22c55e;color:#fff;border:none;border-radius:999px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.bulk-add:hover{background:#16a34a}
+.bulk-clear{background:#fff;color:#6b7280;border:1px solid #d1d5db;border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer}
+.bulk-clear:hover{background:#f9fafb}
+/* ===== 单词表 ===== */
+.vsearch{position:relative;margin-top:12px}
+.vsearch input{width:100%;padding:9px 12px 9px 32px;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;background:#fff;color:#1f2937}
+.vsearch input:focus{outline:none;border-color:#22c55e}
+.vsearch input::placeholder{color:#9ca3af}
+.vsearch span{position:absolute;left:10px;top:7px;color:#9ca3af;font-size:14px}
+.vocab{border:1px solid #e5e7eb;border-radius:10px;margin-top:12px;max-height:520px;overflow-y:auto}
+.vocab::-webkit-scrollbar{width:8px}
+.vocab::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
+.vocab::-webkit-scrollbar-thumb:hover{background:#9ca3af}
+.vmeta{margin-top:10px;font-size:12px;color:#6b7280}
+.vrow{display:grid;grid-template-columns:1fr 1fr;position:relative}
+.vrow div{padding:8px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#4b5563}
+.vrow div:first-child{font-weight:700;border-right:1px solid #f1f5f9;color:#111827}
+.vrow-extra div:nth-child(2){padding-right:18px}
+.vdel{position:absolute;right:3px;top:50%;transform:translateY(-50%);border:none;background:none;color:#d1d5db;font-size:11px;cursor:pointer;display:none;padding:2px 4px;line-height:1}
+.vrow:hover .vdel{display:block}
+.vdel:hover{color:#ef4444}
+.vadd{margin-top:12px;border:1.5px dashed #d1d5db;border-radius:10px;padding:10px;background:#f3f4f6}
+.vadd-t{font-size:12px;color:#4b5563;font-weight:700;margin-bottom:8px}
+.vrow2{display:flex;gap:6px;margin-bottom:6px}
+.vrow2:last-child{margin-bottom:0}
+.vadd input{flex:1;min-width:0;padding:7px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;background:#fff;color:#1f2937}
+.vadd input:focus{outline:none;border-color:#22c55e}
+.vadd input::placeholder{color:#9ca3af}
+.vadd button{background:#22c55e;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.vadd button:hover{background:#16a34a}
+/* ===== 其他知识点（上课手动补充） ===== */
+.extra-zone{margin-top:22px;border:1.5px dashed #d1d5db;border-radius:14px;padding:14px;background:#f9fafb}
+.extra-bar{font-weight:800;font-size:15px;color:#111827;margin-bottom:4px}
+.extra-count{color:#9ca3af;font-weight:600;font-size:13px}
+.extra-hint{font-size:12px;color:#9ca3af;margin:2px 0 10px}
+.extra-form{display:flex;flex-direction:column;gap:8px;margin-top:12px;border-top:1px dashed #e5e7eb;padding-top:12px}
+.extra-form input,.extra-form textarea{width:100%;padding:9px 12px;border:1px solid #e5e7eb;border-radius:9px;font-size:13.5px;font-family:inherit;box-sizing:border-box;background:#fff;color:#1f2937}
+.extra-form input:focus,.extra-form textarea:focus{outline:none;border-color:#22c55e}
+.extra-form input::placeholder,.extra-form textarea::placeholder{color:#9ca3af}
+.extra-form textarea{resize:vertical}
+.extra-form button{align-self:flex-end;background:#22c55e;color:#fff;border:none;border-radius:9px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.extra-form button:hover{background:#16a34a}
+.extra-del{flex:none;color:#d1d5db;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:6px}
+.extra-del:hover{color:#ef4444;background:#fef2f2}
+.empty{display:none;text-align:center;color:#9ca3af;padding:40px}
+@media(max-width:1050px){.wrap{grid-template-columns:190px 1fr}.right{display:none}}
+/* ===== 手机端适配（仅屏幕宽度 <700px 时生效，桌面端布局完全不受影响） ===== */
+@media(max-width:700px){
+.head{flex-wrap:wrap;gap:10px;padding:10px 12px}
+.logo{font-size:16px}
+.search{flex:1 1 100%}
+.search input{font-size:14px;padding:10px 14px 10px 36px}
+.wrap{display:block;padding:12px}
+.side{position:static;margin-bottom:12px;padding:12px}
+.side a{font-size:13.5px;padding:9px 10px}
+.right{display:block;position:static;margin-top:16px;padding:12px}
+.vocab{max-height:260px}
+.main-top{justify-content:flex-end;margin-bottom:10px}
+.course-title{white-space:normal;font-size:10.5px}
+.help-tip{width:calc(100vw - 40px);right:0}
+.week-head{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:12px;padding:12px 14px;border-radius:12px}
+.week-head h2{font-size:19px;line-height:1.35}
+.wk-tools{flex-wrap:wrap;gap:8px}
+.toggle-all{flex:1 1 100%}
+.local-search input{width:100%}
+.topic summary{flex-wrap:wrap;padding:13px 12px;gap:8px}
+.topic summary .sum-txt{flex:1 1 100%}
+.topic summary .mk{margin-left:auto}
+.rev-ops{margin-left:0}
+.body{padding:0 12px 12px}
+.grid{grid-template-columns:1fr}
+.example,.tip{font-size:13.5px;padding:9px 12px;margin:8px 0}
+.syl-grid{grid-template-columns:1fr}
+.syl>summary{font-size:14px;padding:12px}
+.syl-body{padding:0 12px 12px}
+.rev-detail{max-height:320px}
+.rev-item{flex-wrap:wrap}
+.note-add{flex-direction:column;align-items:stretch}
+.note-add textarea{min-height:84px}
+.note-add button{width:100%}
+.note-item{flex-wrap:wrap}
+.note-body{order:1;flex:1 1 100%}
+.note-time{order:2;width:auto}
+.note-del{order:3}
+.bulk-bar{width:calc(100% - 20px);left:10px;transform:none;border-radius:14px;flex-wrap:wrap;justify-content:center;gap:8px;padding:10px 12px;bottom:14px}
+.extra-zone{padding:12px}
+.extra-hint{font-size:11.5px}
+.gresults .gr-total,.gresults .gr-item{font-size:13px}
+}</style>
+</head>
+<body>
+<header>
+<div class="head">
+<div class="brand">
+<div class="logo">COM5104 <i>Study Hub</i></div>
+<div class="course-title">Research Methods for Communication and New Media</div>
+</div>
+<div class="search"><span>⌕</span><input id="q" placeholder="全局搜索：搜索所有知识点……" autocomplete="off"><div class="gresults" id="gresults"></div></div>
+</div>
+</header>
+
+<div class="wrap">
+<aside class="panel side">
+<b>课堂知识点</b>
+<a class="page-link active" data-page="syllabus" href="#syllabus">📋 Syllabus</a>
+<details class="side-group" open>
+<summary>📚 Weeks 1 – 6</summary>
+<a class="page-link" data-page="week1" href="#week1"><b class="wk-no">Week 1</b> · Basic Elements of Research</a>
+<a class="page-link" data-page="week2" href="#week2"><b class="wk-no">Week 2</b> · Research Methods</a>
+<a class="page-link" data-page="week3" href="#week3"><b class="wk-no">Week 3</b> · TBA</a>
+<a class="page-link" data-page="week4" href="#week4"><b class="wk-no">Week 4</b> · TBA</a>
+<a class="page-link" data-page="week5" href="#week5"><b class="wk-no">Week 5</b> · TBA</a>
+<a class="page-link" data-page="week6" href="#week6"><b class="wk-no">Week 6</b> · TBA</a>
+</details>
+<a class="page-link" data-page="assignment" href="#assignment">📌 Assignment</a>
+<a class="page-link" data-page="must" href="#must">⭐ 必背</a>
+<a class="page-link" data-page="review" href="#review">📋 复习清单</a>
+<a class="page-link" data-page="notes" href="#notes">📝 课堂笔记</a>
+</aside>
+
+<main class="main">
+<div class="main-top">
+<div class="help" id="help" tabindex="0" aria-label="使用说明">
+<span class="help-ic">?</span>
+<div class="help-tip">
+<b>怎么用：</b><br>
+① 左侧目录切换页面，知识点可展开 / 收起；每个 Week 页面的「全部展开 / 全部收起」按钮可一次控制。<br>
+② 顶部搜索框 = <b>全局搜索</b>；每个 Week 页面右上角有<b>局部搜索框</b>；右侧单词表有独立<b>小搜索框</b>。<br>
+③ <b>复习清单：</b>勾选多个知识点 → 底部悬浮条「加入复习清单」一键全部加入；在「📋 复习清单」页点击条目直接展开详情，学会后点 <b>Know</b> 移出。<br>
+④ <b>上课随手记：</b>右侧词汇表可输入「英文 + 中文」<b>手动添加单词</b>；每个 Week 页底部「📌 其他知识点」可添加老师补充的知识点；「📝 课堂笔记」页可随时记录整段笔记。<br><br>
+<b>颜色说明：</b><span class="term">绿色加粗</span> = 核心术语 · <b>深色加粗</b> = 重点结论 · <span style="background:#f9fafb;border-left:3px solid #d1d5db;color:#4b5563;padding:1px 8px;border-radius:4px">灰蓝框</span> = 例子 · <span style="background:#f0fdf4;border-left:3px solid #22c55e;color:#047857;padding:1px 8px;border-radius:4px">绿框</span> = 记忆技巧
+</div>
+</div>
+</div>
+
+<div id="gempty" class="empty">没有找到匹配内容。</div>
+
+<!-- ========== Syllabus ========== -->
+<section id="syllabus" class="week-page" style="display:block">
+<div class="week-head">
+<div><h2>📋 Syllabus</h2><p class="sub">课程关键信息：评分结构 · 提交时间线 · 小组须知 · 课堂工具</p></div>
+</div>
+<details class="panel syl" open>
+<summary>课程关键信息速览（必看）</summary>
+<div class="syl-body">
+<div class="syl-grid">
+<div class="syl-sec"><b>📌 评分结构（共 100%）</b>
+<ul>
+<li>In-class Quiz ×2：<span class="dl">20%</span>（每次 10 分，闭卷选择题，覆盖课堂 80% + 阅读 20%）</li>
+<li>Research proposal development：<span class="dl">15%</span>（= Assignment 1：5% + Assignment 2：10%）</li>
+<li>Research paper &amp; presentations：<span class="dl">25%</span>（小组报告+展示）</li>
+<li>Final Quiz（2 小时，覆盖全学期）：<span class="dl">40%</span></li>
+<li>加分（课堂参与 / 研究参与）：≤ 5%</li>
+</ul>
+</div>
+<div class="syl-sec"><b>⏰ 关键时间线（均截止 23:59）</b>
+<ul>
+<li><span class="dl">9/9</span>（Week 2）小组名单提交：6-7 人，含全名 + SIS ID + 拟定主题 + 拟定数据，邮件 TA</li>
+<li><span class="dl">23/9</span>（Week 4）Quiz 1（覆盖 Week 1-3）</li>
+<li><span class="dl">30/9</span>（Week 5）Assignment 1（5%）</li>
+<li><span class="dl">28/10</span>（Week 9 阅读周）Assignment 2（10%）</li>
+<li><span class="dl">11/11</span>（Week 11）Quiz 2（覆盖 Week 4-10）</li>
+<li><span class="dl">25/11</span>（Week 13）小组报告提交 + 展示</li>
+<li><span class="dl">30/11</span>（Mon 14:00）Final Quiz（详情待确认）</li>
+</ul>
+</div>
+<div class="syl-sec"><b>👥 小组项目须知</b>
+<ul>
+<li>每组 6-7 人，尽早找组员；接受老师分配的额外成员（像唐僧一样包容）</li>
+<li>不要做 free-rider，不要「躺平」；项目完成后不要事后投诉</li>
+<li>迟交惩罚：每天扣 1 分</li>
+<li>学术诚信：抄袭、伪造数据 = 严重违规</li>
+</ul>
+</div>
+<div class="syl-sec"><b>📚 课堂与工具</b>
+<ul>
+<li>每周 Slido 小测（不计分，用于发言和检验理解）</li>
+<li>Lecture 1-2h + 课堂练习 / 小组讨论 1-2h</li>
+<li>统计语言 R：需自学，翻转课堂 + 实操</li>
+<li>教材：Babbie《The Practice of Social Research》15e</li>
+<li>作业通用格式：APA 7th · 双倍行距 · 重复率 &lt; 15%</li>
+</ul>
+</div>
+</div>
+</div>
+</details>
+</section>
+
+<!-- ========== Week 1 ========== -->
+<section id="week1" class="week-page">
+<div class="week-head">
+<div><h2>Week 1 · Basic Elements of Research <span class="wk-count"></span></h2><p class="sub">认识论 · 探究的四大错误 · 理论基石 · 研究流程 · 公开数据</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+
+<details class="panel topic" data-wk="week1" data-k="research 研究 systematic investigation problem evidence inferences 系统化">
+<summary><span class="sum-txt">1. Research：什么是研究 ⭐</span></summary>
+<div class="body">
+<p><span class="term">Research</span> 被定义为：对一个 <span class="term">problem（问题）</span> 进行的 <span class="term">systematic investigation（系统化调查）</span>，通过 <span class="term">gathering evidence（收集证据）</span> 来 <span class="term">make inferences（做出推断）</span>。</p>
+<p><span class="key-point">拆开理解四个关键词：</span></p>
+<ul>
+<li><b>Systematic investigation</b>：按流程、有方法地调查，不是拍脑袋、凭感觉。</li>
+<li><b>Problem</b>：有一个明确想回答的问题，研究从问题出发。</li>
+<li><b>Gathering evidence</b>：靠数据/证据说话，而不是靠「我觉得」。</li>
+<li><b>Inferences</b>：从证据中推出结论，通常是从样本推总体、从观察推规律。</li>
+</ul>
+<div class="example"><b>引入例子（课上问题）：</b>「发烧的时候能不能吃冰淇淋？」——不能靠「我妈说不能」或者「我猜没事」回答，而是要去查证据（医学指南、临床研究），看看证据怎么说。这就是研究思维：<b>有疑问 → 系统收集证据 → 下结论</b>。</div>
+<div class="tip">💡 记忆公式：Research = 系统调查 + 问题 + 证据 + 推断（四个词一起背）。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="epistemology 认识论 authority 权威 tradition 传统 how do we know vaccine 疫苗">
+<summary><span class="sum-txt">2. Epistemology：认识论（我们如何知道）⭐</span></summary>
+<div class="body">
+<p><span class="term">Epistemology（认识论）</span> = the science of knowing things，即「我们是如何知道事情的」这门学问。</p>
+<p><span class="key-point">日常知识的两大来源：</span></p>
+<ul>
+<li><span class="term">Authority（权威）</span>：科学家、政治领袖、宗教领袖、社区领袖、父母长辈——我们习惯听权威的话。</li>
+<li><span class="term">Tradition（传统）</span>：来自文化、族群、宗教、社交网络的共享价值观和知识——「一直如此」的知识。</li>
+</ul>
+<p><span class="key-point">这些「知识系统」的弊端（Downsides）：</span>权威会犯错，传统未必正确；如果只靠它们，可能被误导。</p>
+<div class="example"><b>课上例子（疫苗怀疑论）：</b>新冠疫情期间，WhatsApp 群和社交媒体上大量传播「疫苗有害」的传言（如打疫苗后变「磁铁」、导致失明），很多人因为这些「听说」而拒绝疫苗。这些说法来自权威人物的断言或群里的「经验之谈」，而不是系统证据——这正是只依赖 authority / tradition 认识世界的风险。</div>
+<div class="tip">💡 记忆点：科学区别于「听说」——不盲信权威与传统，要用可检验的证据。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="errors in inquiry 探究错误 inaccurate observations overgeneralization selective observation illogical reasoning 不准确观察 过度概括 选择性观察 不合逻辑推理">
+<summary><span class="sum-txt">3. Errors in Inquiry：探究中的四大错误 ⭐</span></summary>
+<div class="body">
+<p>日常认识世界的四种常见错误，也是研究要避免的坑：</p>
+<ol>
+<li><span class="term">Inaccurate observations（不准确的观察）</span>：眼睛和记忆会骗人。课上例子：<b>目击证人证词</b>——研究表明目击者记忆很容易出错，法庭上曾因错误目击导致冤案。</li>
+<li><span class="term">Overgeneralization（过度概括）</span>：从一两个例子推出普遍规律。课上例子：用 <b>「boomer」</b> 一词概括所有年长者——但并不是所有老年人都一样。</li>
+<li><span class="term">Selective observation（选择性观察）</span>：只看支持自己想法的证据，忽略反例——「我觉得行，所以只看见行的例子」。</li>
+<li><span class="term">Illogical reasoning（不合逻辑的推理）</span>：推理链条不成立。课上例子：<b>买彩票</b> 是否「逻辑」？中了才叫逻辑，但概率上并不成立；还有「打完疫苗变磁铁」这类离谱说法。</li>
+</ol>
+<p><span class="key-point">解决办法：</span>用科学方法——系统化观察、记录、检验，避免上面四种偏差。</p>
+<div class="example"><b>一个串联例子：</b>你听说「同学 A 熬夜刷手机成绩变差了」（个别案例），就断言「所有刷手机的人都成绩差」（过度概括），还只举出支持自己的例子（选择性观察），这整个过程就是非科学思维的典型。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="pillars of social science 社会科学支柱 make sense correspond to observations logic data">
+<summary><span class="sum-txt">4. Pillars of Social Science：社会科学的支柱</span></summary>
+<div class="body">
+<p>社会科学建立在两根支柱上，缺一不可：</p>
+<ul>
+<li><span class="term">Make sense（逻辑上说得通）</span>：你的解释要符合逻辑、内部一致。</li>
+<li><span class="term">Correspond to observations（与观察相符）</span>：你的说法要有真实数据/证据支撑。</li>
+</ul>
+<p><span class="key-point">两者关系：</span>只有逻辑没有证据 = 空谈；只有证据没有逻辑 = 一堆散乱的数据。</p>
+<div class="example"><b>举个例子：</b>「刷短视频导致成绩下降」——既要有理论解释为什么（比如注意力分散机制，make sense），也要有数据证明两者相关（correspond to observations），这才算合格的社会科学研究。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="social science 社会科学 aggregates individuals social regularities theory not philosophy belief variables attributes">
+<summary><span class="sum-txt">5. Social Science vs Other Ways：社会科学 vs 其他方式 ⭐</span></summary>
+<div class="body">
+<p>社会科学看社会现象的方式，和日常闲聊、哲学、信仰都不一样，五个核心特征：</p>
+<ol>
+<li><span class="term">Theory, not philosophy or belief</span>：靠系统理论，不是靠信仰或个人哲学。</li>
+<li><span class="term">Social regularities（社会规律性）</span>：寻找社会中的稳定模式和规律，不是孤立的偶然。</li>
+<li><span class="term">Aggregates, not individuals（群体而非个人）</span>：研究的是人群的集体特征，而不是单个个体的故事。</li>
+<li><span class="term">Variables and attributes（变量与属性）</span>：用变量和属性的语言来描述现象。</li>
+<li><span class="term">Independent and dependent variables</span>：区分自变量和因变量。</li>
+</ol>
+<div class="example"><b>举个例子：</b>地铁上人人都在看手机——社会科学家不会只讲「有个人天天刷手机」（个体），而是研究「百分之多少的人、什么年龄层、什么场景下使用手机」（群体规律），这就是 aggregates 的视角。再比如 2024 年美国大选的 <b>voting behavior</b> 研究：看年龄、教育、收入如何与投票行为相关，而不是某个人为什么投了谁。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="concept construct 概念 构念 brick theory love intimacy passion commitment 斯滕伯格">
+<summary><span class="sum-txt">6. Concept &amp; Construct：概念与构念 ⭐</span></summary>
+<div class="body">
+<p><span class="term">Concept（概念）</span> 是理论中最小的元素，就像建筑里的 <b>砖头</b>；它是某个现象的<b>抽象表征</b>。例子：智力、爱、幸福。</p>
+<p><span class="term">Construct（构念）</span>：一些作者把宽泛的大概念称为 construct，它包含若干较窄的概念；但 construct 和 concept 的区分是<b>相对的</b>（大概念可以拆小，小概念也可能再拆）。</p>
+<div class="example"><b>课上例子（爱的构念）：</b>「爱」是个宽泛概念，斯滕伯格（Sternberg）用<b>爱情三角理论</b>把它拆成三个子概念：<br>
+① <b>Intimacy（亲密）</b>：依恋、亲近、联结、羁绊的感觉；<br>
+② <b>Passion（激情）</b>：与迷恋（limerence）和性吸引相关的驱动力；<br>
+③ <b>Commitment（承诺）</b>：决定和另一个人在一起/走下去。</div>
+<div class="tip">💡 记忆：概念 = 砖，理论 = 楼；构念 = 一整套砖的类别。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="relationship 关系 correlational causal form direction strength linear curvilinear">
+<summary><span class="sum-txt">7. Relationship：关系</span></summary>
+<div class="body">
+<p><span class="term">Relationship</span> 是理论中概念之间<b>结构联系</b>的说明。一个完整的关系说明包括四个方面：</p>
+<ul>
+<li><span class="term">Nature（性质）</span>：相关（correlational）还是因果（causal）？</li>
+<li><span class="term">Form（形式）</span>：线性（linear）还是曲线（curvilinear）？</li>
+<li><span class="term">Direction（方向）</span>：正向（positive）还是负向（negative）？</li>
+<li><span class="term">Strength（强度）</span>：强（strong）还是中等（modest）？</li>
+</ul>
+<div class="example"><b>课上练习（看图判断）：</b><br>
+(a) 新闻贴近度 ↑ → 阅读兴趣 ↑：正向线性关系；<br>
+(b) 订阅费 ↑ → 订阅倾向 ↓：负向线性关系；<br>
+(c) 自我表露 ↑ → 人际吸引：先升后降的<b>倒 U 型曲线</b>关系（表露太少没吸引力，太多反而吓跑人）。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="correlation causation 相关 因果 spurious confounder ice cream crime 冰淇淋 犯罪 混淆变量">
+<summary><span class="sum-txt">8. Correlation vs Causation：相关 vs 因果 ⭐</span></summary>
+<div class="body">
+<p><span class="term">Correlation（相关）</span>：两个变量一起变化；<span class="term">Causation（因果）</span>：一个变量<b>导致</b>了另一个变量。相关 ≠ 因果。</p>
+<p><span class="key-point">因果关系的三条判定标准：</span></p>
+<ol>
+<li>A 和 B 相关（correlate）；</li>
+<li>A 在时间上先于 B（A precedes B in time）；</li>
+<li>没有第三个因素（<span class="term">confounder 混淆变量</span>）同时造成 A 和 B——否则就是 <span class="term">spurious correlation（虚假相关）</span>。</li>
+</ol>
+<div class="example"><b>经典例子（冰淇淋与犯罪）：</b>冰淇淋销量上升时犯罪率也上升——但吃冰淇淋不会导致犯罪！真正的原因是<b>「天气热」</b>这个混淆变量：热 → 人们多吃冰淇淋，热 → 人们更容易烦躁犯罪。去掉「热」之后，冰淇淋和犯罪其实没关系。</div>
+<div class="tip">💡 和 Week 2 呼应：横截面调查只能证明相关，所以写假设时用 associated with，别写 causes。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="theory 理论 definition systematic explanation observations cultivation 培养理论 gerbner lighthouse 灯塔">
+<summary><span class="sum-txt">9. Theory：理论 ⭐</span></summary>
+<div class="body">
+<p><span class="term">Theory</span> = <span class="term">Systematic explanation for observations</span>（对观察的系统解释）。</p>
+<p>学术定义：「理论是一组相关的命题，通过指明概念之间的关系，对现象提供一个系统的视角」（Wimmer &amp; Dominick, 2014）。</p>
+<p><span class="key-point">理论的目标：</span>解释原因、预测后果，并且尽可能<b>一般化</b>（超越特定时间和地点）。</p>
+<p><span class="key-point">理论有什么用（What do theories do）：</span>防止「碰巧」的虚假发现（fluke/spurious）、避免垃圾进垃圾出（garbage-in-garbage-out）、把发现放进更广的背景、与前人发现连接、指引研究方向——<b>像灯塔（lighthouse）一样</b>照亮研究。</p>
+<div class="example"><b>课上例子（培养理论）：</b>George Gerbner (1969) 的 <b>Cultivation Theory</b>：重度看电视（The Amount of TV watching）→ 攻击性（The Degree of Aggressiveness）。这就是一个「用变量关系解释现象」的理论。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="attributes variables 属性 变量 occupation perceived attractiveness logical sets">
+<summary><span class="sum-txt">10. Attributes &amp; Variables：属性与变量</span></summary>
+<div class="body">
+<p><span class="term">Attributes（属性）</span>：描述一个人或物体的特征。例子：女性、亚洲人、农民。</p>
+<p><span class="term">Variables（变量）</span>：一组属性的<b>逻辑集合</b>。一个变量由多个属性构成。</p>
+<div class="example"><b>举个例子：</b><br>
+• 变量「职业」（Occupation）= 属性「农民、会计、飞行员……」的集合；<br>
+• 变量「感知吸引力」（Perceived attractiveness）= 用 1-5 分的同意程度来测量（1 = 非常不同意，5 = 非常同意）。</div>
+<div class="tip">💡 一句话：属性是「选项」，变量是「装了这些选项的盒子」。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="independent variable dependent variable IV DV 自变量 因变量 smoking advertisement">
+<summary><span class="sum-txt">11. Independent / Dependent Variables：自变量与因变量 ⭐</span></summary>
+<div class="body">
+<div class="grid">
+<div class="box"><b class="term">IV · Independent Variable 自变量</b><br>引发 / 改变其他变量的变量（被认为的「原因」）。</div>
+<div class="box"><b class="term">DV · Dependent Variable 因变量</b><br>被其他变量（自变量）引发 / 改变的变量（「结果」）。</div>
+</div>
+<div class="example"><b>课上例子（吸烟广告）：</b><br>看吸烟广告（IV）→ 吸烟行为（DV）。<br>也就是说：我们认为「看广告」会改变「吸烟行为」。</div>
+<div class="tip">💡 判断技巧：先问「结果是什么」→ 那是 DV；再问「什么导致了它」→ 那是 IV。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="theories hypotheses 理论 假设 theory the way things work specific study">
+<summary><span class="sum-txt">12. Theories &amp; Hypotheses：理论与假设</span></summary>
+<div class="body">
+<p><span class="term">Theory</span> = the way things work（事物运行的宏观规律，大圈）；<br><span class="term">Hypotheses（假设）</span> = specific study（从理论推导出的、针对具体研究的命题，小圈）。</p>
+<p>假设是理论在某个具体场景下的「落地版本」：理论很抽象、很宏观，假设则具体到变量、可检验。</p>
+<div class="example"><b>举个例子：</b><br>
+理论（培养理论）：看得越多电视，越容易相信世界是危险的。<br>
+假设（具体研究）：在本次调查的 500 名大学生中，每天看电视 3 小时以上者，感知到的社会危险程度显著高于 1 小时以下者。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="deductive inductive 演绎 归纳 wheel of science 科学之轮 general specific observation pattern theory">
+<summary><span class="sum-txt">13. Deductive &amp; Inductive：演绎与归纳（科学之轮）⭐</span></summary>
+<div class="body">
+<p>两种发展理论 / 做研究的推理方向：</p>
+<div class="grid">
+<div class="box"><b class="term">Deductive（演绎）</b><br>一般 → 特殊<br>先预测，再观察检验预测<br>自上而下检验理论<br>流程：Theory → Hypothesis → Observation → Confirmation</div>
+<div class="box"><b class="term">Inductive（归纳）</b><br>特殊 → 一般<br>先观察发现规律，再预测<br>自下而上建构理论<br>流程：Observation → Pattern → Tentative Hypothesis → Theory</div>
+</div>
+<p><span class="term">The Wheel of Science（科学之轮）</span>：Theories → Hypotheses → Observations → Generalizations →（回到 Theories）循环往复——演绎和归纳一起构成科学研究不断推进的轮子。</p>
+<div class="example"><b>举个例子：</b><br>
+演绎：先有理论「暴力内容增加攻击性」→ 推出假设「玩暴力游戏的人更爱打架」→ 去观察验证。<br>
+归纳：先观察「很多重度游戏玩家脾气急」→ 发现规律 → 提出初步假设 → 慢慢形成理论。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="purposes of social research 研究目的 exploratory descriptive explanatory 探索性 描述性 解释性 empirical pew nips">
+<summary><span class="sum-txt">14. Purposes of Social Research：社会研究的目的 ⭐</span></summary>
+<div class="body">
+<p>研究问题必须是 <span class="term">empirical（经验的）</span>：能用可观察的证据回答。</p>
+<p>社会研究有三种目的：</p>
+<ol>
+<li><span class="term">Exploratory（探索性）</span>：对一个新现象做初步了解，「到底有没有这回事？」<br>
+<b>例子：</b>预测试品牌/产品名（Burger King、Pizza Hut、KFC、Wendy's、DQ、Alibaba 等）；AI 顶会 NIPS 因名字争议改名为 NeurIPS 的案例。</li>
+<li><span class="term">Descriptive（描述性）</span>：准确描述现状，「有多少人、什么比例？」<br>
+<b>例子：</b>皮尤研究中心（Pew）调查：96% 的美国成年人拥有手机，81% 拥有智能手机——而且不同年龄、收入、教育背景差异很大（65+ 只有 53% 有智能手机）。</li>
+<li><span class="term">Explanatory（解释性）</span>：解释机制和因果，「为什么？」<br>
+<b>例子：</b>Lee et al. (2016) 乳腺癌知识研究：风险感知 → 媒体关注（报纸/电视/网络）→ 人际沟通与阐述 → 事实性/结构性知识，路径系数检验每个环节的影响。</li>
+</ol>
+<div class="tip">💡 记忆：探索 = 有没有？描述 = 有多少？解释 = 为什么？</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="based on samples 样本 推断 inferences population time locations 总体 yougov hong kong dating">
+<summary><span class="sum-txt">15. Based on Samples：基于样本的推断</span></summary>
+<div class="body">
+<p>大多数研究基于 <span class="term">sample（样本）</span> 而非全体，目标是做出推断（inferences）：</p>
+<ul>
+<li>推断到更大的总体（a larger population）</li>
+<li>推断到其他时间段（other time periods）</li>
+<li>推断到其他地点/社会（other locations/societies）</li>
+</ul>
+<div class="example"><b>课上例子（香港网约）：</b>YouGov 在 2017 年用 1,013 人的样本（香港在线人群加权代表）发现：<b>四成香港人用过网络约会服务</b>，近半数千禧一代用过；但 42% 的香港寻爱者仍更愿意线下认识另一半。</div>
+<div class="tip">💡 记忆：样本是「一扇窗」，研究目的是通过窗户看到更大的世界。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="research process 研究流程 find form literature review 文献综述 logical testable refutable positive data resources">
+<summary><span class="sum-txt">16. The Research Process：研究流程 ⭐</span></summary>
+<div class="body">
+<p>完整的研究流程，从想法到报告：</p>
+<ol>
+<li><b class="term">Find（找想法）</b>：选一个大致的主题领域；然后做<b>文献综述（literature review）</b>，找出相关变量和「还没人回答的问题」。</li>
+<li><b class="term">Form（形成假设）</b>：提出假设和预测——好假设要 <span class="key-point">Logical（有逻辑）、Testable（可检验）、Refutable（可证伪）、Positive（积极明确）</span>。</li>
+<li>决定如何<b>定义和测量变量</b>；</li>
+<li>确定并<b>选择参与者</b>；</li>
+<li><b>选择研究设计</b>；</li>
+<li><b>实施研究</b>；</li>
+<li><b>评估数据</b>；</li>
+<li><b>报告结果</b>；</li>
+<li><b>修正或重新表述</b>你的想法（循环）。</li>
+</ol>
+<p><span class="key-point">文献综述可用资源：</span>Web of Science、LexisNexis Academic、Communication &amp; Mass Media Complete、EBSCOhost、PsycARTICLES / PsycINFO 等数据库；文献管理工具：EndNote / Mendeley。</p>
+<div class="tip">💡 记忆：研究 = Find（选题）→ Form（假设）→ 设计 → 数据 → 报告 → 修正。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="academic research applied research 学术研究 应用研究 basic industry data property conferences ica aejmc nca iamcr aapor">
+<summary><span class="sum-txt">17. Academic vs Applied Research：学术 vs 应用研究</span></summary>
+<div class="body">
+<div class="grid">
+<div class="box"><b class="term">Academic Research（学术研究）</b><br>· 「基础」研究（basic）<br>· 大学/基金会资助，回答理论问题<br>· 由学术界执行<br>· 数据归研究者，但可被其他研究者使用</div>
+<div class="box"><b class="term">Applied Research（应用研究）</b><br>· 常叫「业界」研究（industry）<br>· 企业赞助，回答具体应用问题<br>· 由学术界 / 企业研究部门 / 市场调研或咨询公司执行<br>· 数据归客户（client）所有</div>
+</div>
+<p><span class="key-point">最大区别：</span>学术研究为「知识」而做，应用研究为「客户」而做——因此<b>数据的归属权</b>不同。</p>
+<p>传播学的主要学术会议：<span class="term">ICA</span>（国际传播学会）、<span class="term">AEJMC</span>、<span class="term">NCA</span>、<span class="term">IAMCR</span>、<span class="term">AAPOR</span>。</p>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week1" data-k="publicly available data 公开数据 icpsr cnsda wvs gss issp dataverse osf 小组项目 数据集">
+<summary><span class="sum-txt">18. Publicly Available Data：公开数据资源 ⭐</span></summary>
+<div class="body">
+<p>小组项目找数据，从这些公开资源开始：</p>
+<p><span class="key-point">① 调查数据档案（Survey data archives）</span></p>
+<ul>
+<li><span class="term">ICPSR</span>：Inter-University Consortium for Political and Social Research，25 万+ 社会科学和行为科学研究文件，https://www.icpsr.umich.edu/</li>
+<li><span class="term">CNSDA</span>：中国国家调查数据档案（Chinese National Survey Data Archive），http://www.cnsda.org/</li>
+</ul>
+<p><span class="key-point">② 大型调查项目（Major survey projects）</span></p>
+<ul>
+<li><span class="term">WVS</span> 世界价值观调查（全球价值观）· <span class="term">GSS</span> 综合社会调查（美国态度与行为趋势）· <span class="term">East Asian Social Survey</span> 东亚社会调查 · <span class="term">ISSP</span> 国际社会调查项目 · <span class="term">Global Barometer</span> 全球晴雨表（含 Asian Barometer 亚洲晴雨表）</li>
+</ul>
+<p><span class="key-point">③ 开放科学平台（Open science platforms）</span></p>
+<ul>
+<li><span class="term">Dataverse</span>（哈佛开发，社会科学数据，https://dataverse.org/）· <span class="term">OSF</span>（Open Science Framework，https://osf.io/）</li>
+</ul>
+<div class="tip">💡 行动建议：Assignment 1 要求「公开数据集的来源与描述」——现在就可以去 WVS / GSS / ICPSR 逛一逛，找 3-5 个自变量 + 2-3 个因变量都齐全的数据集。</div>
+</div>
+</details>
+
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week1" class="extra-list"></div>
+<form class="extra-form" data-week="week1">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Week 2 ========== -->
+<section id="week2" class="week-page">
+<div class="week-head">
+<div><h2>Week 2 · Research Methods <span class="wk-count"></span></h2><p class="sub">研究方法 · 概念化 · 自变量/因变量 · 假设 · 数据集</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+
+<details class="panel topic" data-wk="week2" data-k="research methods qualitative quantitative 定性 定量">
+<summary><span class="sum-txt">1. Research Methods：研究方法总览</span></summary>
+<div class="body">
+<p><span class="term">Qualitative Research（定性研究）</span>：深入理解人的经验、意义、动机和自然情境，核心回答 <span class="key-point">「为什么」(Why?)</span> 的问题。它不追求数字统计，而是挖掘现象背后的原因和感受。</p>
+<div class="example"><b>举个例子：</b>你想知道「为什么大家熬夜刷短视频停不下来」，就去和几个深度用户聊天，听他们讲刷视频时的心理状态、现实中的压力和满足感，这就是定性研究。</div>
+<p><span class="term">Quantitative Research（定量研究）</span>：把社会现象转化为可测量的数字，通过统计分析寻找规律和关联，核心回答「是什么」「有多少」的问题。</p>
+<div class="example"><b>举个例子：</b>你想知道「大学生平均每天刷多久短视频」，就发1000份问卷回收数据，算出平均时长、不同年级的差异，这就是定量研究。</div>
+<div class="grid">
+<div class="box"><b>Qualitative 定性</b><br>Field Observation · Focus Group · In-depth Interview</div>
+<div class="box"><b>Quantitative 定量</b><br>Survey · Experiment · Content Analysis</div>
+</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="field observation 田野观察 natural setting ethnography">
+<summary><span class="sum-txt">2. Field Observation：田野观察</span></summary>
+<div class="body">
+<p>研究者进入真实的生活场景，在不干预的情况下观察人们的日常活动，核心强调 <span class="term">natural setting（自然环境）</span>，也就是在真实发生的地方做研究，而不是在实验室里。</p>
+<p>它非常适合做 <span class="term">ethnography（民族志）</span> 研究和建构新理论。</p>
+<p><span class="key-point">优点：</span>能获得非常丰富、有情境感的一手资料，可以看到人们真实怎么做，而不是嘴上说怎么做。</p>
+<p><span class="key-point">缺点：</span>研究范围小，结论很难推广到更大的群体；研究者的主观感受可能影响观察结果；非常耗费时间和人力成本。</p>
+<div class="example"><b>举个例子：</b>你想研究外卖骑手的工作状态，就每天跟着骑手一起跑单、一起吃饭，观察他们怎么接单、怎么和顾客沟通、怎么应对平台规则，持续观察几个月，这就是典型的田野观察。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="focus group 焦点小组 moderator questionnaire hypotheses preliminary information">
+<summary><span class="sum-txt">3. Focus Group：焦点小组</span></summary>
+<div class="body">
+<p>把一组（通常6-10人）参与者召集到一起，由 <span class="term">moderator（主持人）</span> 引导围绕某个主题自由讨论。</p>
+<p>它的核心价值是<strong>群体互动</strong>：一个人的发言会启发其他人，能激发出很多一对一访谈得不到的想法。</p>
+<p><span class="key-point">典型用途：</span></p>
+<ul>
+<li>收集 preliminary information（初步信息）</li>
+<li>为后续的调查问卷设计做准备</li>
+<li>探索和发现潜在的研究假设</li>
+</ul>
+<div class="tip">💡 记忆点：它特别适合「你还不知道该研究什么」的<strong>研究前期探索阶段</strong>，用来快速摸清方向。</div>
+<div class="example"><b>举个例子：</b>你想做一个面向大学生的学习APP，但不知道用户需要什么功能，就找8个大学生坐在一起聊，大家你一言我一语，最后整理出十几个需求点，这就是焦点小组的用法。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="in-depth interview 深度访谈 motivations intentions beliefs attitudes feelings sensitive">
+<summary><span class="sum-txt">4. In-depth Interview：深度访谈</span></summary>
+<div class="body">
+<p>一对一、半结构化或非结构化的访谈形式，研究者通过不断追问，深入了解受访者的 intentions（意图）、motivations（动机）、beliefs（信念）、attitudes（态度）和 feelings（感受）。</p>
+<p>和普通采访不同，它更像「深入聊天」，问题可以灵活调整，顺着受访者的话往下挖。</p>
+<p><span class="key-point">适合场景：</span>敏感话题、复杂行为背后的原因、个人独特经历等不适合公开讨论的内容。</p>
+<p><span class="key-point">局限性：</span>样本量通常很小，研究结论难以推广到更大的人群；访谈资料的分析难度高，非常依赖研究者的能力。</p>
+<div class="example"><b>举个例子：</b>你想研究青少年遭遇网络霸凌后的心理影响，这种话题不适合当众说，就和受访者一对一私密访谈，慢慢引导他讲出经历和感受，这就是深度访谈的典型应用。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="survey 问卷 cross-sectional self-report causality">
+<summary><span class="sum-txt">5. Survey：问卷调查</span></summary>
+<div class="body">
+<p>通过向大量受访者发放问题，收集回答并进行统计分析来研究问题。它可以一次性获取很多人的多个变量信息，效率很高。</p>
+<p><span class="key-point">两个核心考点：</span></p>
+<ol>
+<li><span class="term">Cross-sectional survey（横截面调查）</span> 很难判断 <strong>causality（因果关系）</strong>。你只能看到两个变量有关联，但不知道谁是因谁是果。</li>
+<li><span class="term">Self-report（自我报告）</span> 存在偏差：人们可能记错、可能不好意思说实话（社会期望偏差），导致答案不一定真实。</li>
+</ol>
+<div class="example"><b>举个例子：</b>你调查发现「刷短视频越多的人，成绩越差」，但你不能直接说「刷短视频导致成绩差」——也可能是成绩差的人更爱刷短视频，或者有第三个因素（比如自律性）同时影响两者。这就是横截面调查不能确定因果的原因。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="experiment 实验 random assignment causal inference independent variable dependent variable media effects">
+<summary><span class="sum-txt">6. Experiment：实验</span></summary>
+<div class="body">
+<p>研究者主动改变某个条件，然后观察结果的变化，以此研究 <span class="term">cause-and-effect relationship（因果关系）</span>。它是所有方法里最适合确定因果的。</p>
+<p><span class="term">Random Assignment（随机分配）</span> 是实验的重要特征：把被试随机分到不同组，这样两组人在其他所有方面（年龄、性格、习惯等）平均来看都是差不多的，最后结果的差异就可以归因为你改变的那个条件。</p>
+<p><span class="key-point">优势：</span>可以进行因果推断，内部效度高。</p>
+<p><span class="key-point">局限：</span>实验情境通常比较人工化，和真实生活有差距，结论的外部推广性有限。</p>
+<div class="example"><b>举个例子：</b>你想知道「短视频时长会不会影响注意力」，就把100个人随机分成两组：一组看15秒短视频，一组看3分钟短视频，看完都做同一份注意力测试。如果两组得分有明显差异，你就可以说「是视频时长导致了注意力差异」。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="content analysis 内容分析 coding coding scheme coder reliability media texts">
+<summary><span class="sum-txt">7. Content Analysis：内容分析</span></summary>
+<div class="body">
+<p>系统、客观地分析 media texts/programs（媒体文本/节目）等内容，把定性的内容转化为可以统计的数据。</p>
+<p>核心步骤是建立 <span class="term">coding scheme（编码方案）</span>，也就是明确规定「什么内容算哪一类」，然后按照规则给内容打分或分类。</p>
+<p>为了保证客观性，通常由多个 <span class="term">coder（编码员）</span> 独立编码，然后比较结果的一致性，以此检验 <span class="term">reliability（信度）</span>。一致性越高，说明编码越可靠。</p>
+<div class="example"><b>举个例子：</b>你想研究「抖音新闻里女性形象的占比」，就先制定编码规则：什么算新闻视频、人物性别怎么判断、出场时长怎么算。然后让两个同学分别去给100条视频编码，最后对比两个人的结果重合度，重合度高就说明你的编码是可靠的。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="conceptualization 概念化 concept fuzzy imprecise specific precise">
+<summary><span class="sum-txt">8. Conceptualization：概念化 ⭐</span></summary>
+<div class="body">
+<p><span class="key-point">核心：</span>把模糊、不精确的日常概念，变得具体、精确、可以被研究测量。</p>
+<p>做研究时必须回答一个问题：<strong>「我到底在测量什么？」</strong> 概念化就是给你要研究的概念下一个清晰的研究定义。</p>
+<p>课堂引用 Babbie (2021)：概念化是让 fuzzy / imprecise notions（模糊的观念）变得 more specific / precise（更具体精确）的过程。</p>
+<div class="example"><b>举个例子：</b>日常说的「沉迷手机」就是个模糊概念——到底每天玩多久算沉迷？还是不玩就难受才算沉迷？<br>概念化之后，你可以把它定义为：「每日使用智能手机超过6小时，且出现戒断反应、影响正常学习生活的行为模式」。这样它就变成了一个可以被测量的研究概念。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="concept explication sub-dimensions attention news teaching quality 子维度">
+<summary><span class="sum-txt">9. Concept Explication：拆分概念维度 ⭐</span></summary>
+<div class="body">
+<p>重点是识别一个大概念下面包含的 <span class="term">sub-dimensions（子维度）</span>，把一个笼统的大概念拆成几个具体的小方面，让研究更清晰。</p>
+<p>就像把一个大蛋糕切成几块，每一块都更容易拿起来研究。</p>
+<div class="grid">
+<div class="box"><b>Attention to News（新闻关注）</b><br>电视新闻关注 · 网络新闻关注 · 报纸新闻关注</div>
+<div class="box"><b>Teaching Quality（教学质量）</b><br>课堂氛围 · 教学技巧 · 知识储备</div>
+</div>
+<div class="example"><b>再举个例子：</b>「社交媒体使用」这个大概念，可以拆成三个子维度：① 使用行为（时长、频率）② 使用动机（娱乐、社交、学习）③ 使用场景（睡前、吃饭、通勤）。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="independent variable IV 自变量 dependent variable DV 因变量">
+<summary><span class="sum-txt">10. IV / DV：自变量与因变量 ⭐</span></summary>
+<div class="body">
+<div class="grid">
+<div class="box"><b class="term">IV · Independent Variable 自变量</b><br>被假设为「原因」的变量，是你认为会影响结果的那个因素。</div>
+<div class="box"><b class="term">DV · Dependent Variable 因变量</b><br>被假设为「结果」的变量，是你想要解释、观察或测量的那个结果。</div>
+</div>
+<p><span class="key-point">逻辑结构：</span> 自变量（IV）→ 影响 → 因变量（DV）</p>
+<div class="example"><b>举几个例子：</b><br>• 年龄（IV）→ 社交媒体使用时长（DV）<br>• 广告投放量（IV）→ 产品销量（DV）<br>• 睡眠时长（IV）→ 考试成绩（DV）</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="hypothesis 假设 positive negative associated related causes cross-sectional experimental">
+<summary><span class="sum-txt">11. Hypothesis Writing：假设写作 ⭐</span></summary>
+<div class="body">
+<p><span class="key-point">基本原则：</span>一个假设原则上包含 <strong>1个自变量 + 1个因变量</strong>，并且要说明两者是正向（positive）还是负向（negative）关系。</p>
+<p><span class="term">Cross-sectional（横截面研究）：</span> 用 related to / associated with / positively associated with / negatively associated with 这类词，<strong>不要随便写 causes（导致）</strong>，因为横截面研究不能确定因果。</p>
+<p><span class="term">Experimental（实验研究）：</span> 可以比较不同实验条件下的因变量差异，使用「导致」「影响」这类因果表述。</p>
+<div class="example"><b>横截面假设（正确写法）：</b>大学生的社交媒体使用时长与焦虑水平呈正相关。<br><br><b>实验假设（正确写法）：</b>相比于观看15秒短视频的被试，观看3分钟短视频的被试在随后的注意力测试中得分更低。</div>
+</div>
+</details>
+
+<details class="panel topic" data-wk="week2" data-k="dataset data public dataset sample size missing values variables research questions hypotheses">
+<summary><span class="sum-txt">12. How to Choose Data：如何选择数据 ⭐</span></summary>
+<div class="body">
+<ol>
+<li><span class="key-point">先确定大致研究主题</span>，不要反过来为了用某个数据硬找题目。</li>
+<li><span class="key-point">优先找完整的公开数据集</span>，而不是零散地分别找自变量和因变量。一个好的公开数据集通常已经包含了很多变量，可以直接用。</li>
+<li>拿到数据先检查：<span class="key-point">能不能支撑你提出研究问题和假设？</span> 里面有没有你需要的核心变量。</li>
+<li>理想情况：数据里有 <strong>3-5个潜在自变量 + 2-3个潜在因变量</strong>，这样你的研究有更多选择空间。</li>
+<li><span class="key-point">样本量（Sample size）</span> 最好300以上，但这不是硬性规定，根据研究方法和主题可以调整。</li>
+<li>检查 <span class="term">missing values（缺失值）</span>：如果某个核心变量一大半数据都空着，这个数据就不好用。</li>
+<li><span class="key-point">接受数据的不完美</span>：没有完美的数据集，每个数据都有它的 flaws / weaknesses，能说明局限性就可以。</li>
+</ol>
+<div class="tip">💡 小技巧：找数据时可以先看看领域内常用的公开数据库，比如 WVS、GSS、ICPSR、CNSDA 等，里面变量非常丰富（详见 Week 1 第 18 个知识点）。</div>
+</div>
+</details>
+
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week2" class="extra-list"></div>
+<form class="extra-form" data-week="week2">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Week 3 ========== -->
+<section id="week3" class="week-page">
+<div class="week-head">
+<div><h2>Week 3 <span class="wk-count"></span></h2><p class="sub">把 Week 3 PPT 内容加入这里即可。</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+<details class="panel topic" data-wk="week3" data-k="week3 待添加"><summary><span class="sum-txt">Week 3 · TBA</span></summary><div class="body">把 Week 3 PPT 内容加入这里即可。</div></details>
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week3" class="extra-list"></div>
+<form class="extra-form" data-week="week3">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Week 4 ========== -->
+<section id="week4" class="week-page">
+<div class="week-head">
+<div><h2>Week 4 <span class="wk-count"></span></h2><p class="sub">把 Week 4 PPT 内容加入这里即可。</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+<details class="panel topic" data-wk="week4" data-k="week4 待添加"><summary><span class="sum-txt">Week 4 · TBA</span></summary><div class="body">把 Week 4 PPT 内容加入这里即可。</div></details>
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week4" class="extra-list"></div>
+<form class="extra-form" data-week="week4">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Week 5 ========== -->
+<section id="week5" class="week-page">
+<div class="week-head">
+<div><h2>Week 5 <span class="wk-count"></span></h2><p class="sub">把 Week 5 PPT 内容加入这里即可。</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+<details class="panel topic" data-wk="week5" data-k="week5 待添加"><summary><span class="sum-txt">Week 5 · TBA</span></summary><div class="body">待添加。</div></details>
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week5" class="extra-list"></div>
+<form class="extra-form" data-week="week5">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Week 6 ========== -->
+<section id="week6" class="week-page">
+<div class="week-head">
+<div><h2>Week 6 <span class="wk-count"></span></h2><p class="sub">把 Week 6 PPT 内容加入这里即可。</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
+</div>
+</div>
+<details class="panel topic" data-wk="week6" data-k="week6 待添加"><summary><span class="sum-txt">Week 6 · TBA</span></summary><div class="body">待添加。</div></details>
+<div class="extra-zone">
+<div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
+<div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
+<div id="extra-week6" class="extra-list"></div>
+<form class="extra-form" data-week="week6">
+<input class="extra-title" placeholder="知识点名称，如：Research Ethics（研究伦理）" autocomplete="off">
+<textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
+<button type="submit">＋ 添加</button>
+</form>
+</div>
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== Assignment ========== -->
+<section id="assignment" class="week-page">
+<div class="week-head">
+<div><h2>📌 Assignment <span class="wk-count"></span></h2><p class="sub">所有作业的提交要求与截止时间（持续更新，每个作业有各自的截止日）</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索作业要求……" autocomplete="off"></div>
+</div>
+</div>
+<div class="tip" style="margin:0 0 12px">📝 <b>通用要求：</b>APA 7th · 双倍行距 · 重复率 &lt; 15% · 迟交每天扣 1 分 · 小组由 1 名组员代表提交 Word 文档。</div>
+
+<details class="panel topic" data-wk="assignment" data-k="assignment 1 5% 30 september 2026 apa 7 two pages similarity topic rationale dataset">
+<summary><span class="sum-txt">Assignment 1（5% · 截止 30 Sept 2026 23:59）</span></summary>
+<div class="body">
+<ol>
+<li>Project topic / research question（研究主题/研究问题）+ rationale（研究理由/重要性）</li>
+<li>Source and description of the public data set（所用公开数据集的来源与描述）</li>
+</ol>
+<p>格式：最多 2 页；APA 7th；双倍行距；含 title page + 组员信息；References 不计入 2 页。</p>
+</div>
+</details>
+
+<details class="panel topic" data-wk="assignment" data-k="assignment 2 10% 28 october 2026 hypotheses justifications measurement items scales likert semantic differential">
+<summary><span class="sum-txt">Assignment 2（10% · 截止 28 Oct 2026 23:59）</span></summary>
+<div class="body">
+<ol>
+<li>Hypotheses（研究假设）+ justifications（假设的论证/理由）</li>
+<li>假设中变量的 measurement items（测量条目）描述——列出具体条目及其测量量表，例如：binary scale（二分量表）、5-point Likert scale（5 点李克特量表）、7-point semantic differential scale（7 点语义差异量表）</li>
+</ol>
+</div>
+</details>
+
+<details class="panel topic" data-wk="assignment" data-k="final report 小组报告 25% 25 november 2026 presentation structure">
+<summary><span class="sum-txt">小组报告 + 展示（25% · 截止 25 Nov 2026 23:59）</span></summary>
+<div class="body">
+<p>报告结构（Research implementation, writing and presentations）：</p>
+<ol>
+<li>Introduction to research（研究导论）</li>
+<li>Literature review（文献综述）</li>
+<li>Hypotheses（假设）</li>
+<li>Description of the data set（数据集描述）</li>
+<li>Data analysis（数据分析）</li>
+<li>Findings and discussions（发现与讨论）</li>
+<li>Implications and future research（启示与未来研究）</li>
+<li>Project report and presentation（报告 + 课堂展示）</li>
+</ol>
+</div>
+</details>
+
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== 必背 ========== -->
+<section id="must" class="week-page">
+<div class="week-head">
+<div><h2>⭐ 必背清单（按周） <span class="wk-count"></span></h2><p class="sub">考前快速过一遍的核心考点，按 Week 分卡片</p></div>
+<div class="wk-tools">
+<button class="toggle-all" type="button">全部展开</button>
+<div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索必背内容……" autocomplete="off"></div>
+</div>
+</div>
+
+<details class="panel topic" data-wk="must" data-k="week1 must 必背 research epistemology errors pillars concept relationship causation theory attributes IV DV deductive inductive purposes process">
+<summary><span class="sum-txt">Week 1 必背</span></summary>
+<div class="body">
+<ul>
+<li>Research = 对问题的系统调查 + 收集证据 + 做出推断</li>
+<li>Epistemology = 认识论，the science of knowing things</li>
+<li>知识来源 Authority（权威）/ Tradition（传统）都可能出错，科学靠证据</li>
+<li>四大错误：不准确观察 / 过度概括 / 选择性观察 / 不合逻辑推理</li>
+<li>社会科学支柱：Make sense（逻辑）+ Correspond to observations（证据）</li>
+<li>社会科学看群体聚合（aggregates）和社会规律（regularities），不是个人</li>
+<li>Concept = 理论的最小元素（砖）；Construct = 宽泛概念（可拆子概念）</li>
+<li>Relationship 四要素：nature / form / direction / strength</li>
+<li>因果三标准：相关 + 时间先后 + 无混淆变量（警惕 spurious correlation）</li>
+<li>Theory = Systematic explanation for observations，解释原因、预测后果</li>
+<li>Attributes = 特征；Variables = 属性的逻辑集合</li>
+<li>IV 引发/改变 DV</li>
+<li>Theory（宏观）⊃ Hypotheses（具体研究）</li>
+<li>Deductive 演绎：一般→特殊，自上而下；Inductive 归纳：特殊→一般，自下而上</li>
+<li>科学之轮：Theories → Hypotheses → Observations → Generalizations</li>
+<li>研究目的：Exploratory 探索 / Descriptive 描述 / Explanatory 解释</li>
+<li>研究流程：Find（选题+文献）→ Form（假设：logical, testable, refutable, positive）→ 设计 → 数据 → 报告</li>
+<li>公开数据：ICPSR / CNSDA / WVS / GSS / ISSP / Dataverse / OSF</li>
+</ul>
+</div>
+</details>
+
+<details class="panel topic" data-wk="must" data-k="week2 must 必背 qualitative quantitative survey experiment content analysis conceptualization IV DV cross-sectional">
+<summary><span class="sum-txt">Week 2 必背</span></summary>
+<div class="body">
+<ul>
+<li>Qualitative → 回答 Why?，挖原因和感受</li>
+<li>Quantitative → 转化为 Numbers，做统计</li>
+<li>Survey → 问人，横截面不能说因果</li>
+<li>Experiment → 改变条件看结果，研究 causality</li>
+<li>Content Analysis → 给媒体内容编码，算信度</li>
+<li>Conceptualization → 把模糊概念变清楚可测量</li>
+<li>Concept Explication → 大概念拆成 sub-dimensions</li>
+<li>IV → Independent Variable 自变量（原因）</li>
+<li>DV → Dependent Variable 因变量（结果）</li>
+<li>Cross-sectional → 用 associated/related，别随便写 causes</li>
+</ul>
+</div>
+</details>
+
+<details class="panel topic" data-wk="must" data-k="week3 must 必背 待添加">
+<summary><span class="sum-txt">Week 3 必背</span></summary>
+<div class="body">Week 3 内容补充后，把必背考点加在这里。</div>
+</details>
+
+<div class="week-empty empty">本周没有匹配内容。</div>
+</section>
+
+<!-- ========== 复习清单 ========== -->
+<section id="review" class="week-page">
+<div class="week-head">
+<div><h2>📋 复习清单 <span class="wk-count"></span></h2><p class="sub">勾选知识点一键加入清单；点击条目直接展开详情，学会后点 Know 移出</p></div>
+<div class="wk-tools"><button class="toggle-all" type="button">全部展开</button></div>
+</div>
+<div id="review-list"></div>
+<div id="review-empty" class="empty" style="display:block">清单是空的：去任意 Week 页面，勾选知识点右侧的方框，然后点底部「加入复习清单」一键加入。</div>
+</section>
+
+<!-- ========== 课堂笔记 ========== -->
+<section id="notes" class="week-page" style="display:none">
+<div class="week-head">
+<div><h2>📝 课堂笔记 <span class="note-count"></span></h2><p class="sub">随时记录老师课上补充的内容，任何设备打开都在</p></div>
+</div>
+<div class="note-add">
+<textarea id="note-input" placeholder="写点什么…（Ctrl / ⌘ + Enter 快速添加）" rows="2"></textarea>
+<button id="note-btn" type="button">添加笔记</button>
+</div>
+<div id="note-list"></div>
+<div id="note-empty" class="empty" style="display:block">还没有笔记，写下第一条吧。</div>
+</section>
+
+</main>
+
+<div id="bulk" class="bulk-bar">
+<span>已选 <b id="bulk-n">0</b> 个知识点</span>
+<button class="bulk-add" id="bulk-add" type="button">加入复习清单</button>
+<button class="bulk-clear" id="bulk-clear" type="button">清空选择</button>
+</div>
+
+<aside class="panel right">
+<b>ENGLISH QUICK LOOK · 词汇速查</b>
+<div class="vmeta" id="vmeta"></div>
+<div class="vsearch"><span>⌕</span><input id="vq" placeholder="搜索英文单词 / 中文释义……" autocomplete="off"></div>
+<div class="vadd">
+<div class="vadd-t">＋ 手动添加单词（上课遇到不会的词）</div>
+<div class="vrow2"><input id="va-en" placeholder="英文单词，如：Paradigm" autocomplete="off"><button id="va-btn" type="button">添加</button></div>
+<div class="vrow2"><input id="va-cn" placeholder="中文释义（可留空）" autocomplete="off"><span id="va-tip" style="display:none;color:#dc2626;font-size:12px;white-space:nowrap;align-self:center"></span></div>
+</div>
+<div class="vocab" id="vocab">
+<!-- Week 1 -->
+<div class="vrow"><div>Research</div><div>研究</div></div>
+<div class="vrow"><div>Epistemology</div><div>认识论</div></div>
+<div class="vrow"><div>Authority</div><div>权威</div></div>
+<div class="vrow"><div>Tradition</div><div>传统</div></div>
+<div class="vrow"><div>Inaccurate Observation</div><div>不准确观察</div></div>
+<div class="vrow"><div>Overgeneralization</div><div>过度概括</div></div>
+<div class="vrow"><div>Selective Observation</div><div>选择性观察</div></div>
+<div class="vrow"><div>Illogical Reasoning</div><div>不合逻辑的推理</div></div>
+<div class="vrow"><div>Concept</div><div>概念</div></div>
+<div class="vrow"><div>Construct</div><div>构念</div></div>
+<div class="vrow"><div>Attributes</div><div>属性</div></div>
+<div class="vrow"><div>Variables</div><div>变量</div></div>
+<div class="vrow"><div>Theory</div><div>理论</div></div>
+<div class="vrow"><div>Relationship</div><div>关系</div></div>
+<div class="vrow"><div>Correlation</div><div>相关</div></div>
+<div class="vrow"><div>Causation</div><div>因果</div></div>
+<div class="vrow"><div>Spurious Correlation</div><div>虚假相关</div></div>
+<div class="vrow"><div>Confounder</div><div>混淆变量</div></div>
+<div class="vrow"><div>Deductive Reasoning</div><div>演绎推理</div></div>
+<div class="vrow"><div>Inductive Reasoning</div><div>归纳推理</div></div>
+<div class="vrow"><div>Wheel of Science</div><div>科学之轮</div></div>
+<div class="vrow"><div>Exploratory Research</div><div>探索性研究</div></div>
+<div class="vrow"><div>Descriptive Research</div><div>描述性研究</div></div>
+<div class="vrow"><div>Explanatory Research</div><div>解释性研究</div></div>
+<div class="vrow"><div>Sample</div><div>样本</div></div>
+<div class="vrow"><div>Inference</div><div>推断</div></div>
+<div class="vrow"><div>Literature Review</div><div>文献综述</div></div>
+<div class="vrow"><div>Academic Research</div><div>学术研究</div></div>
+<div class="vrow"><div>Applied Research</div><div>应用研究</div></div>
+<div class="vrow"><div>Public Dataset</div><div>公开数据集</div></div>
+<div class="vrow"><div>ICPSR</div><div>校际政治与社会研究联盟</div></div>
+<div class="vrow"><div>WVS</div><div>世界价值观调查</div></div>
+<div class="vrow"><div>GSS</div><div>综合社会调查</div></div>
+<!-- Week 2 -->
+<div class="vrow"><div>Research Methods</div><div>研究方法</div></div>
+<div class="vrow"><div>Qualitative</div><div>定性研究</div></div>
+<div class="vrow"><div>Quantitative</div><div>定量研究</div></div>
+<div class="vrow"><div>Observation</div><div>观察</div></div>
+<div class="vrow"><div>Focus Group</div><div>焦点小组</div></div>
+<div class="vrow"><div>Moderator</div><div>主持人</div></div>
+<div class="vrow"><div>In-depth Interview</div><div>深度访谈</div></div>
+<div class="vrow"><div>Survey</div><div>问卷调查</div></div>
+<div class="vrow"><div>Experiment</div><div>实验</div></div>
+<div class="vrow"><div>Random Assignment</div><div>随机分配</div></div>
+<div class="vrow"><div>Causal Inference</div><div>因果推断</div></div>
+<div class="vrow"><div>Content Analysis</div><div>内容分析</div></div>
+<div class="vrow"><div>Coding Scheme</div><div>编码方案</div></div>
+<div class="vrow"><div>Coder</div><div>编码员</div></div>
+<div class="vrow"><div>Reliability</div><div>信度</div></div>
+<div class="vrow"><div>Conceptualization</div><div>概念化</div></div>
+<div class="vrow"><div>Concept Explication</div><div>概念拆分/阐释</div></div>
+<div class="vrow"><div>Sub-dimension</div><div>子维度</div></div>
+<div class="vrow"><div>Independent Variable</div><div>自变量</div></div>
+<div class="vrow"><div>Dependent Variable</div><div>因变量</div></div>
+<div class="vrow"><div>Hypothesis</div><div>假设</div></div>
+<div class="vrow"><div>Positive Association</div><div>正向关联</div></div>
+<div class="vrow"><div>Negative Association</div><div>负向关联</div></div>
+<div class="vrow"><div>Cross-sectional</div><div>横截面研究</div></div>
+<div class="vrow"><div>Dataset</div><div>数据集</div></div>
+<div class="vrow"><div>Missing Values</div><div>缺失值</div></div>
+<div class="vrow"><div>Sample Size</div><div>样本量</div></div>
+<div class="vrow"><div>Generalizability</div><div>可推广性</div></div>
+<div class="vrow"><div>Subjective Bias</div><div>主观偏差</div></div>
+<div class="vrow"><div>Natural Setting</div><div>自然环境</div></div>
+<div class="vrow"><div>Self-report</div><div>自我报告</div></div>
+</div>
+</aside>
+</div>
+
+<script>
+const gq=document.getElementById('q'),gres=document.getElementById('gresults'),gempty=document.getElementById('gempty');
+const pages=[...document.querySelectorAll('.week-page')];
+const links=[...document.querySelectorAll('.page-link')];
+let topics=[...document.querySelectorAll('.topic')];
+let current='syllabus';
+
+/* 搜索文本（排除操作区按钮文字） */
+function haystack(t){
+  const sum=t.querySelector('.sum-txt');
+  const body=t.querySelector('.body');
+  return ((t.dataset.k||'')+' '+(sum?sum.innerText:'')+' '+(body?body.innerText:'')).toLowerCase();
+}
+
+function showWeek(id,reset){
+  pages.forEach(p=>p.style.display=(p.id===id)?'block':'none');
+  links.forEach(a=>a.classList.toggle('active',a.dataset.page===id));
+  current=id;
+  if(reset){
+    gq.value='';gres.style.display='none';gempty.style.display='none';
+    topics.forEach(t=>t.style.display='');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+links.forEach(a=>a.onclick=e=>{e.preventDefault();showWeek(a.dataset.page,true);});
+
+/* 全局搜索：搜所有内容 */
+gq.oninput=()=>{
+  const s=gq.value.trim().toLowerCase();
+  if(!s){gres.style.display='none';gempty.style.display='none';topics.forEach(t=>t.style.display='');return;}
+  const counts={};
+  topics.forEach(t=>{
+    const hit=haystack(t).includes(s);
+    t.style.display=hit?'block':'none';
+    if(hit){t.open=true;const w=t.dataset.wk||'week1';counts[w]=(counts[w]||0)+1;}
+  });
+  const ids=Object.keys(counts);
+  if(!ids.length){gempty.style.display='block';gres.style.display='none';return;}
+  gempty.style.display='none';
+  if(!counts[current])showWeek(ids[0],false);
+  const items=ids.map(id=>{
+    const el=document.querySelector('.page-link[data-page="'+id+'"]');
+    const label=el?el.textContent.trim():id;
+    return '<div class="gr-item" data-w="'+id+'">'+label+' <span style="color:#16a34a;font-weight:700">（'+counts[id]+' 条）</span></div>';
+  }).join('');
+  gres.innerHTML='<div class="gr-total">共 '+ids.reduce((a,b)=>a+counts[b],0)+' 条匹配，点击跳转：</div>'+items;
+  gres.style.display='block';
+};
+gres.onclick=e=>{
+  const it=e.target.closest('.gr-item');
+  if(it){showWeek(it.dataset.w,false);gres.style.display='none';}
+};
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))gres.style.display='none';});
+
+/* 每个页面：局部搜索 + 全部展开/收起 */
+pages.forEach(pg=>{
+  const input=pg.querySelector('.ls');
+  const box=pg.querySelector('.week-empty');
+  if(input){
+    input.oninput=()=>{
+      const s=input.value.trim().toLowerCase();
+      let n=0;
+      pg.querySelectorAll('.topic').forEach(t=>{
+        const hit=!s||haystack(t).includes(s);
+        t.style.display=hit?'block':'none';
+        if(hit)n++;
+        if(s&&hit)t.open=true;
+      });
+      if(box)box.style.display=(s&&!n)?'block':'none';
+    };
+  }
+  const btn=pg.querySelector('.toggle-all');
+  if(btn){
+    const sync=()=>{
+      if(pg.id==='review'){
+        const ds=pg.querySelectorAll('.rev-detail');
+        btn.textContent=ds.length&&[...ds].every(d=>d.style.display==='block')?'全部收起':'全部展开';
+        return;
+      }
+      const ts=pg.querySelectorAll('.topic');
+      btn.textContent=[...ts].every(t=>t.open)?'全部收起':'全部展开';
+    };
+    btn.onclick=()=>{
+      if(pg.id==='review'){
+        const ds=pg.querySelectorAll('.rev-detail');
+        const all=ds.length&&[...ds].every(d=>d.style.display==='block');
+        ds.forEach(d=>d.style.display=all?'none':'block');
+        pg.querySelectorAll('.rev-item').forEach(it=>it.classList.toggle('open',!all));
+        sync();
+        return;
+      }
+      const ts=pg.querySelectorAll('.topic');
+      const all=[...ts].every(t=>t.open);
+      ts.forEach(t=>t.open=!all);
+      sync();
+    };
+    sync();
+  }
+});
+
+/* 单词表小搜索 + 手动添加单词 */
+/* 云端同步状态（声明提前，避免 TDZ） */
+let syncText='';
+let syncTimer=null;
+const vq=document.getElementById('vq'),vmeta=document.getElementById('vmeta');
+const vaEn=document.getElementById('va-en'),vaCn=document.getElementById('va-cn'),vaBtn=document.getElementById('va-btn'),vaTip=document.getElementById('va-tip');
+const getVrows=()=>[...document.querySelectorAll('.vrow')];
+const VA_KEY='com5104_vocab_add';
+let extraVocab=[];
+try{extraVocab=JSON.parse(localStorage.getItem(VA_KEY)||'[]');}catch(err){extraVocab=[];}
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function saveVocab(){try{localStorage.setItem(VA_KEY,JSON.stringify(extraVocab));}catch(err){}schedulePush();}
+function updateVmeta(s,n){
+  const all=getVrows().length;
+  const base=s?('匹配 '+n+' 词 / 共 '+all+' 词'):('共 '+all+' 词');
+  vmeta.textContent=base+' · 滚轮滚动查看'+(syncText?(' · '+syncText):'');
+}
+function renderExtraVocab(){
+  const box=document.getElementById('vocab');
+  box.querySelectorAll('.vrow-extra').forEach(r=>r.remove());
+  extraVocab.forEach((v,idx)=>{
+    const row=document.createElement('div');
+    row.className='vrow vrow-extra';
+    row.innerHTML='<div>'+escapeHtml(v.en)+'</div><div>'+escapeHtml(v.cn||v.en)+'</div>'
+      +'<button class="vdel" type="button" title="删除该词汇">✕</button>';
+    box.appendChild(row);
+    row.querySelector('.vdel').onclick=e=>{
+      e.stopPropagation();
+      row.remove();
+      extraVocab.splice(idx,1);
+      saveVocab();
+      updateVmeta();
+    };
+  });
+}
+function addVocab(){
+  const en=vaEn.value.trim(),cn=vaCn.value.trim();
+  if(!en){vaEn.focus();return;}
+  if(getVrows().some(r=>r.firstElementChild.textContent.toLowerCase()===en.toLowerCase())){
+    vaTip.textContent='⚠ 该单词已存在';
+    vaTip.style.display='inline';
+    setTimeout(()=>{vaTip.style.display='none';},2000);
+    return;
+  }
+  extraVocab.push({en:en,cn:cn});
+  saveVocab();
+  renderExtraVocab();
+  vaEn.value='';vaCn.value='';
+  updateVmeta();
+}
+vaBtn.onclick=addVocab;
+vaEn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVocab();}});
+vaCn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVocab();}});
+renderExtraVocab();
+updateVmeta();
+vq.oninput=()=>{
+  const s=vq.value.trim().toLowerCase();
+  let n=0;
+  getVrows().forEach(r=>{
+    const hit=!s||r.innerText.toLowerCase().includes(s);
+    r.style.display=hit?'':'none';
+    if(hit)n++;
+  });
+  updateVmeta(s,n);
+};
+
+/* 每个页面知识点计数 */
+pages.forEach(pg=>{
+  const el=pg.querySelector('.wk-count');
+  if(el)el.textContent=pg.querySelectorAll('.topic').length+' 个知识点';
+});
+
+/* 使用说明 icon：悬停 + 点击（触屏） */
+const help=document.getElementById('help');
+help.addEventListener('click',e=>{e.stopPropagation();help.classList.toggle('open');});
+document.addEventListener('click',e=>{if(!e.target.closest('.help'))help.classList.remove('open');});
+
+/* ===== 复习清单 ===== */
+const REVIEW_KEY='com5104_review';
+let reviewList=[];
+try{reviewList=JSON.parse(localStorage.getItem(REVIEW_KEY)||'[]');}catch(err){reviewList=[];}
+const reviewBox=document.getElementById('review-list');
+const reviewEmpty=document.getElementById('review-empty');
+const reviewCount=document.querySelector('#review .wk-count');
+
+/* 批量选择：勾选多个后一键加入 */
+const selected=new Set();
+const bulk=document.getElementById('bulk'),bulkN=document.getElementById('bulk-n');
+const bulkAdd=document.getElementById('bulk-add'),bulkClear=document.getElementById('bulk-clear');
+function updateBulk(){
+  bulkN.textContent=selected.size;
+  bulk.style.display=selected.size?'flex':'none';
+}
+function markAdded(tid){
+  const t=getTopic(tid);
+  if(!t)return;
+  const chk=t.querySelector('.rev-chk input');
+  const inTag=t.querySelector('.rev-in');
+  if(chk){chk.checked=true;chk.disabled=true;}
+  if(inTag)inTag.style.display='inline-block';
+}
+function unmarkAdded(tid){
+  const t=getTopic(tid);
+  if(!t)return;
+  const chk=t.querySelector('.rev-chk input');
+  const inTag=t.querySelector('.rev-in');
+  if(chk){chk.checked=false;chk.disabled=false;}
+  if(inTag)inTag.style.display='none';
+}
+bulkAdd.onclick=()=>{
+  selected.forEach(tid=>{
+    if(!reviewList.includes(tid))reviewList.push(tid);
+    markAdded(tid);
+  });
+  selected.clear();
+  updateBulk();
+  saveReview();
+  renderReview();
+};
+bulkClear.onclick=()=>{
+  selected.forEach(tid=>{
+    const t=getTopic(tid);
+    if(t){const chk=t.querySelector('.rev-chk input');if(chk)chk.checked=false;}
+  });
+  selected.clear();
+  updateBulk();
+};
+
+function saveReview(){try{localStorage.setItem(REVIEW_KEY,JSON.stringify(reviewList));}catch(err){}schedulePush();}
+function getTopic(tid){return document.querySelector('.topic[data-tid="'+tid+'"]');}
+function getWeekName(wid){const l=document.querySelector('.page-link[data-page="'+wid+'"]');return l?l.textContent.trim():wid;}
+
+/* 给所有知识点补折叠标记；给 Week 1-6 知识点注入 勾选框 + 加入按钮 */
+let extraSeq=0;
+function setupTopic(t,pg,tid){
+  const sum=t.querySelector('summary');
+  if(!sum)return;
+  if(!sum.querySelector('.sum-txt')){
+    sum.innerHTML='<span class="sum-txt">'+sum.innerHTML+'</span>';
+  }
+  if(!sum.querySelector('.mk')){
+    const mk=document.createElement('span');
+    mk.className='mk';
+    sum.appendChild(mk);
+  }
+  if(!/^week\d+$/.test(pg.id))return;
+  if(t.dataset.tid)return;
+  if(!tid)tid=pg.id+'-x'+(extraSeq++);
+  t.dataset.tid=tid;
+  const ops=document.createElement('span');
+  ops.className='rev-ops';
+  ops.innerHTML='<label class="rev-chk" title="勾选后可批量加入复习清单"><input type="checkbox"><span>选</span></label>'
+    +'<span class="rev-in" style="display:none">已加入 ✓</span>';
+  sum.appendChild(ops);
+  ops.addEventListener('click',e=>e.stopPropagation());
+  const chk=ops.querySelector('input'),inTag=ops.querySelector('.rev-in');
+  chk.addEventListener('change',()=>{
+    if(chk.checked)selected.add(tid);else selected.delete(tid);
+    updateBulk();
+  });
+  if(reviewList.includes(tid)){
+    chk.checked=true;chk.disabled=true;inTag.style.display='inline-block';
+  }
+}
+document.querySelectorAll('.week-page').forEach(pg=>{
+  pg.querySelectorAll('.topic').forEach((t,i)=>{
+    if(t.dataset.tid)return;
+    setupTopic(t,pg,pg.id+'-'+i);
+  });
+});
+
+/* ===== 其他知识点（上课手动补充，按周保存） ===== */
+const EXTRA_KEY='com5104_extra';
+let extraData={};
+try{extraData=JSON.parse(localStorage.getItem(EXTRA_KEY)||'{}');}catch(err){extraData={};}
+function saveExtra(){try{localStorage.setItem(EXTRA_KEY,JSON.stringify(extraData));}catch(err){}schedulePush();}
+function renderExtras(){
+  pages.forEach(pg=>{
+    const list=document.getElementById('extra-'+pg.id);
+    if(!list)return;
+    list.innerHTML='';
+    const arr=extraData[pg.id]||[];
+    arr.forEach((it,idx)=>{
+      const d=document.createElement('details');
+      d.className='panel topic';
+      d.dataset.wk=pg.id;
+      const sum=document.createElement('summary');
+      const st=document.createElement('span');
+      st.className='sum-txt';
+      st.textContent=it.title;
+      const del=document.createElement('span');
+      del.className='extra-del';
+      del.textContent='✕';
+      del.title='删除这个补充知识点';
+      del.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(!confirm('确定删除「'+it.title+'」吗？'))return;
+        removeExtra(pg.id,idx);
+      });
+      sum.appendChild(st);
+      sum.appendChild(del);
+      const body=document.createElement('div');
+      body.className='body';
+      const p=document.createElement('p');
+      p.innerHTML=escapeHtml(it.body||'').replace(/\n/g,'<br>');
+      body.appendChild(p);
+      d.appendChild(sum);
+      d.appendChild(body);
+      list.appendChild(d);
+      setupTopic(d,pg,pg.id+'-x'+idx);
+    });
+    const cnt=document.querySelector('#extra-'+pg.id).closest('.extra-zone').querySelector('.extra-count');
+    if(cnt)cnt.textContent=arr.length?('（'+arr.length+' 条）'):'';
+  });
+  topics=[...document.querySelectorAll('.topic')];
+}
+function removeExtra(wid,idx){
+  const tid=wid+'-x'+idx;
+  if(!extraData[wid])return;
+  extraData[wid].splice(idx,1);
+  if(!extraData[wid].length)delete extraData[wid];
+  saveExtra();
+  reviewList=reviewList.filter(x=>x!==tid);
+  selected.delete(tid);
+  updateBulk();
+  saveReview();
+  renderReview();
+  renderExtras();
+}
+document.querySelectorAll('.extra-form').forEach(f=>{
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    const wid=f.dataset.week;
+    const ti=f.querySelector('.extra-title');
+    const bo=f.querySelector('.extra-body');
+    const t=ti.value.trim(),b=bo.value.trim();
+    if(!t){ti.focus();return;}
+    if(!extraData[wid])extraData[wid]=[];
+    extraData[wid].push({title:t,body:b||'（未填写详细内容）'});
+    saveExtra();
+    renderExtras();
+    ti.value='';bo.value='';
+  });
+});
+renderExtras();
+
+/* 渲染复习清单（点击条目直接展开详情） */
+function renderReview(){
+  if(reviewCount)reviewCount.textContent=reviewList.length+' 个知识点';
+  reviewBox.innerHTML='';
+  if(!reviewList.length){reviewEmpty.style.display='block';syncReviewToggle();return;}
+  reviewEmpty.style.display='none';
+  reviewList.forEach(tid=>{
+    const t=getTopic(tid);
+    if(!t)return;
+    const sumTxt=t.querySelector('.sum-txt');
+    const title=sumTxt?sumTxt.innerText:tid;
+    const wid=t.closest('.week-page').id;
+    const body=t.querySelector('.body');
+    const row=document.createElement('div');
+    row.className='rev-item';
+    row.innerHTML='<span class="rev-title" data-tid="'+tid+'" title="点击展开/收起详情">'+title+'</span>'
+      +'<span class="rev-wk">'+getWeekName(wid)+'</span>'
+      +'<button class="rev-know" type="button" data-tid="'+tid+'">Know ✓</button>'
+      +'<div class="rev-detail"></div>';
+    reviewBox.appendChild(row);
+    const detail=row.querySelector('.rev-detail');
+    if(body)detail.innerHTML=body.innerHTML;
+  });
+  reviewBox.querySelectorAll('.rev-title').forEach(el=>{
+    el.onclick=()=>{
+      const row=el.closest('.rev-item');
+      const detail=row.querySelector('.rev-detail');
+      const open=detail.style.display==='block';
+      detail.style.display=open?'none':'block';
+      row.classList.toggle('open',!open);
+      syncReviewToggle();
+    };
+  });
+  reviewBox.querySelectorAll('.rev-know').forEach(el=>{
+    el.onclick=()=>{
+      const tid=el.dataset.tid;
+      reviewList=reviewList.filter(x=>x!==tid);
+      saveReview();
+      unmarkAdded(tid);
+      renderReview();
+    };
+  });
+  syncReviewToggle();
+}
+
+/* 复习清单页「全部展开/收起」按钮文字同步 */
+function syncReviewToggle(){
+  const btn=document.querySelector('#review .toggle-all');
+  if(!btn)return;
+  const ds=reviewBox.querySelectorAll('.rev-detail');
+  btn.textContent=ds.length&&[...ds].every(d=>d.style.display==='block')?'全部收起':'全部展开';
+}
+
+/* ===== 云端同步（Cloudflare KV）：本地 + 云端双写，任何设备打开都看到同一份数据 ===== */
+function setSyncState(t){syncText=t;updateVmeta();}
+function schedulePush(){clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
+function pushToCloud(){
+  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes})})
+  .then(r=>r.ok?r.json():Promise.reject())
+  .then(()=>setSyncState('☁ 已同步'))
+  .catch(()=>setSyncState('⚠ 离线，改动暂存本机'));
+}
+const SYNC_TS_KEY='com5104_sync_ts';
+async function loadFromCloud(){
+  try{
+    setSyncState('☁ 同步中…');
+    const r=await fetch('/api/data',{cache:'no-store'});
+    if(!r.ok)throw new Error('bad');
+    const d=await r.json();
+    let lastTs=0,tsRaw=null;
+    try{tsRaw=localStorage.getItem(SYNC_TS_KEY);}catch(e){}
+    if(tsRaw){try{lastTs=parseInt(tsRaw,10)||0;}catch(e){lastTs=0;}}
+    const firstBoot=!(tsRaw&&lastTs>0);
+    if(d&&d.v){
+      if(firstBoot){
+        /* 首次升级（或云端曾为空）：合并云端 ∪ 本地一次，建立基线，任何一方数据都不丢 */
+        const myReview=reviewList, myExtra=extraData, myVocab=extraVocab;
+        reviewList=[...new Set([...(Array.isArray(d.review)?d.review:[]),...myReview])];
+        const cloudExtra=(d.extra&&typeof d.extra==='object')?d.extra:{};
+        extraData={};
+        new Set([...Object.keys(cloudExtra),...Object.keys(myExtra)]).forEach(wk=>{
+          const seen=new Set();
+          extraData[wk]=[...(cloudExtra[wk]||[]),...(myExtra[wk]||[])].filter(it=>{
+            const id=(String(it.title||'')+'|'+String(it.body||'')).toLowerCase();
+            if(!id||seen.has(id))return false; seen.add(id); return true;
+          });
+          if(!extraData[wk].length)delete extraData[wk];
+        });
+        const seenV=new Set();
+        extraVocab=[...(Array.isArray(d.vocab)?d.vocab:[]),...myVocab].filter(v=>{
+          const k=String(v.en||'').toLowerCase();
+          if(!k||seenV.has(k))return false; seenV.add(k); return true;
+        });
+        const cloudNotes=Array.isArray(d.notes)?d.notes:[];
+        const seenN=new Set();
+        notes=[...cloudNotes,...notes].filter(n=>{
+          const id=String((n&&n.id)||'');
+          if(!id||seenN.has(id))return false; seenN.add(id); return true;
+        });
+        try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
+        saveLocalAll();
+        renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
+        setSyncState('☁ 已同步');
+        pushToCloud();
+      }else if(d.v>lastTs){
+        /* 云端较新：以云端为准覆盖本地 —— 让「其他设备删除的条目」也能传播过来 */
+        reviewList=Array.isArray(d.review)?d.review:[];
+        extraData=(d.extra&&typeof d.extra==='object')?d.extra:{};
+        extraVocab=Array.isArray(d.vocab)?d.vocab:[];
+        notes=Array.isArray(d.notes)?d.notes:[];
+        try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
+        saveLocalAll();
+        renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
+        setSyncState('☁ 已同步');
+      }else{
+        /* 本地较新或相同：以本地为准推回云端 —— 让「刚删除/刚添加」立即同步出去 */
+        pushToCloud();
+        setSyncState('☁ 已同步');
+      }
+    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length){
+      pushToCloud();
+    }else{
+      setSyncState('☁ 已同步');
+    }
+  }catch(e){setSyncState('⚠ 离线，改动暂存本机');}
+}
+function saveLocalAll(){
+  try{localStorage.setItem(REVIEW_KEY,JSON.stringify(reviewList));}catch(e){}
+  try{localStorage.setItem(EXTRA_KEY,JSON.stringify(extraData));}catch(e){}
+  try{localStorage.setItem(VA_KEY,JSON.stringify(extraVocab));}catch(e){}
+  try{localStorage.setItem(NOTE_KEY,JSON.stringify(notes));}catch(e){}
+}
+/* ===== 课堂笔记（本地 + 云端同步） ===== */
+const NOTE_KEY='com5104_notes';
+let notes=[];
+try{notes=JSON.parse(localStorage.getItem(NOTE_KEY)||'[]');}catch(err){notes=[];}
+const noteInput=document.getElementById('note-input'),noteBtn=document.getElementById('note-btn');
+const noteListEl=document.getElementById('note-list'),noteEmpty=document.getElementById('note-empty');
+const noteCount=document.querySelector('#notes .note-count');
+function saveNotes(){try{localStorage.setItem(NOTE_KEY,JSON.stringify(notes));}catch(err){}schedulePush();}
+function renderNotes(){
+  if(!noteListEl)return;
+  noteListEl.innerHTML='';
+  notes.slice().reverse().forEach(n=>{
+    const d=document.createElement('div');
+    d.className='note-item';
+    const b=document.createElement('div');b.className='note-body';b.textContent=n.text;
+    const t=document.createElement('time');t.className='note-time';t.textContent=n.time;
+    const del=document.createElement('button');del.className='note-del';del.type='button';del.textContent='✕';del.title='删除这条笔记';
+    del.onclick=()=>{notes=notes.filter(x=>x.id!==n.id);saveNotes();renderNotes();};
+    d.appendChild(b);d.appendChild(t);d.appendChild(del);
+    noteListEl.appendChild(d);
+  });
+  if(noteEmpty)noteEmpty.style.display=notes.length?'none':'block';
+  if(noteCount)noteCount.textContent=notes.length?('· '+notes.length+' 条'):'';
+}
+function addNote(){
+  const text=noteInput.value.trim();
+  if(!text){noteInput.focus();return;}
+  notes.push({id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:text,time:new Date().toLocaleString('zh-CN',{hour12:false})});
+  noteInput.value='';
+  saveNotes();renderNotes();
+}
+if(noteBtn)noteBtn.onclick=addNote;
+if(noteInput)noteInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();addNote();}});
+renderNotes();
+loadFromCloud();
+</script>
+</body>
+</html>
