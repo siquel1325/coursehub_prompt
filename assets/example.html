@@ -36,6 +36,11 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .side a:hover,.side a.active{background:#f0fdf4;color:#16a34a}
 .side .wk-no{color:#22c55e;font-weight:800}
 .side-group{margin:6px 0 2px;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff}
+.hub-mark{width:54px;height:54px;margin:2px auto 12px;border-radius:50%;border:2.5px solid #22c55e;display:flex;align-items:center;justify-content:center;position:relative;cursor:default;background:#fff;transition:border-color .15s,transform .15s}
+.hub-mark-q{font-size:25px;font-weight:800;color:#16a34a;font-family:Georgia,"Times New Roman",serif;line-height:1}
+.hub-mark::after{content:'';position:absolute;right:6px;bottom:6px;width:13px;height:13px;border-radius:50%;background:rgba(34,197,94,.16)}
+.hub-mark:hover{border-color:#16a34a;transform:scale(1.04)}
+.hub-mark:hover .hub-mark-q{color:#15803d}
 .side-group>summary{cursor:pointer;list-style:none;padding:10px 12px;font-weight:750;font-size:13px;color:#1f2937;display:flex;align-items:center;justify-content:space-between;user-select:none}
 .side-group>summary::-webkit-details-marker{display:none}
 .side-group>summary:after{content:"＋";color:#9ca3af;font-weight:400}
@@ -152,6 +157,26 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .vdel{position:absolute;right:3px;top:50%;transform:translateY(-50%);border:none;background:none;color:#d1d5db;font-size:11px;cursor:pointer;display:none;padding:2px 4px;line-height:1}
 .vrow:hover .vdel{display:block}
 .vdel:hover{color:#ef4444}
+.vstar{position:absolute;right:26px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:13px;color:#d1d5db;padding:2px 4px;line-height:1;z-index:2}
+.vstar:hover{color:#f59e0b}
+.vrow.starred{background:#f0fdf4}
+.vrow.starred>div:first-child{color:#166534}
+.vrow.starred .vstar{color:#f59e0b}
+.vword{cursor:pointer;transition:color .12s}
+.vword:hover{color:#15803d;text-decoration:underline}
+.vword-editing{color:#15803d}
+.vnote{grid-column:1/-1;padding:2px 8px 8px;font-size:12px;color:#374151;background:#f9fafb;border-top:1px dashed #e5e7eb;cursor:pointer;line-height:1.55}
+.vnote b{color:#166534}
+.vnote:hover{background:#f0fdf4}
+.vnote-edit{grid-column:1/-1;padding:6px 8px 8px;background:#f9fafb;border-top:1px dashed #e5e7eb}
+.vnote-ta{width:100%;box-sizing:border-box;min-height:56px;border:1px solid #d1d5db;border-radius:8px;padding:7px 9px;font-size:12px;resize:vertical;background:#fff;color:#1f2937;font-family:inherit;line-height:1.55}
+.vnote-ta:focus{outline:none;border-color:#22c55e}
+.vnote-btns{display:flex;gap:6px;margin-top:6px}
+.vnote-btns button{border:none;border-radius:7px;padding:5px 11px;font-size:12px;cursor:pointer;font-weight:700}
+.vnote-save{background:#22c55e;color:#fff}
+.vnote-save:hover{background:#16a34a}
+.vnote-clear{background:#fef2f2;color:#dc2626}
+.vnote-cancel{background:#e5e7eb;color:#374151}
 .vadd{margin-top:12px;border:1.5px dashed #d1d5db;border-radius:10px;padding:10px;background:#f3f4f6}
 .vadd-t{font-size:12px;color:#4b5563;font-weight:700;margin-bottom:8px}
 .vrow2{display:flex;gap:6px;margin-bottom:6px}
@@ -320,7 +345,7 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 
 <div class="wrap">
 <aside class="panel side">
-<b>课堂知识点</b>
+<div class="hub-mark" title="CourseHub · 用 AI 生成的课程复习站"><span class="hub-mark-q">Q</span></div>
 <a class="page-link active" data-page="syllabus" href="#syllabus">📋 Syllabus</a>
 <details class="side-group" open>
 <summary>📚 Weeks 1 – 6</summary>
@@ -1734,12 +1759,70 @@ const getVrows=()=>[...document.querySelectorAll('.vrow')];
 const VA_KEY='com5104_vocab_add';
 let extraVocab=[];
 try{extraVocab=JSON.parse(localStorage.getItem(VA_KEY)||'[]');}catch(err){extraVocab=[];}
+/* 词汇个性化数据：key=英文小写，value={star:是否重点, note:专属解释} —— 静态词与手动词共用，云端同步 */
+const VN_KEY='com5104_vocab_notes';
+let vocabNotes={};
+try{vocabNotes=JSON.parse(localStorage.getItem(VN_KEY)||'{}');}catch(err){vocabNotes={};}
+function saveVnotes(){try{localStorage.setItem(VN_KEY,JSON.stringify(vocabNotes));}catch(err){}schedulePush();}
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function saveVocab(){try{localStorage.setItem(VA_KEY,JSON.stringify(extraVocab));}catch(err){}schedulePush();}
 function updateVmeta(s,n){
   const all=getVrows().length;
   const base=s?('匹配 '+n+' 词 / 共 '+all+' 词'):('共 '+all+' 词');
   vmeta.textContent=base+' · 滚轮滚动查看'+(syncText?(' · '+syncText):'');
+}
+function rowKey(row){const el=row&&row.querySelector('.vword');return el?el.textContent.trim().toLowerCase():'';}
+function applyRowV(row){
+  const k=rowKey(row);if(!k)return;
+  const cur=vocabNotes[k]||{};
+  row.classList.toggle('starred',!!cur.star);
+  const st=row.querySelector('.vstar');if(st)st.textContent=cur.star?'★':'☆';
+  row.querySelectorAll(':scope > .vnote').forEach(x=>x.remove());
+  if(cur.note){
+    const d=document.createElement('div');d.className='vnote';
+    d.title='点击编辑这条解释';
+    d.innerHTML='<b>💡 我的理解：</b>'+escapeHtml(cur.note);
+    row.appendChild(d);
+  }
+}
+function attachVocabRow(row){
+  if(row.dataset.vattached)return;row.dataset.vattached='1';
+  const w=row.querySelector(':scope > div:first-child');
+  if(!w)return;
+  w.classList.add('vword');w.title='点击添加 / 编辑该词的解释';
+  if(!row.querySelector('.vstar')){
+    const b=document.createElement('button');b.type='button';b.className='vstar';b.title='标记为重点单词（★）';
+    b.textContent='☆';
+    row.appendChild(b);
+  }
+  applyRowV(row);
+}
+function openNoteEdit(row){
+  row.querySelectorAll(':scope > .vnote-edit').forEach(x=>x.remove());
+  const k=rowKey(row);if(!k)return;
+  const cur=vocabNotes[k]||{};
+  const wrap=document.createElement('div');wrap.className='vnote-edit';
+  wrap.innerHTML='<textarea class="vnote-ta" placeholder="写下你对该专业术语的理解（可随时点击编辑）"></textarea>'
+    +'<div class="vnote-btns"><button class="vnote-save" type="button">保存解释</button>'
+    +(cur.note?'<button class="vnote-clear" type="button">清除</button>':'')
+    +'<button class="vnote-cancel" type="button">取消</button></div>';
+  row.appendChild(wrap);
+  const ta=wrap.querySelector('.vnote-ta');ta.value=cur.note||'';ta.focus();
+  const word=row.querySelector('.vword');if(word)word.classList.add('vword-editing');
+}
+function closeNoteEdit(row,reRender){
+  row.querySelectorAll(':scope > .vnote-edit').forEach(x=>x.remove());
+  const word=row.querySelector('.vword');if(word)word.classList.remove('vword-editing');
+  if(reRender)applyRowV(row);
+}
+function saveVocabNote(btn){
+  const row=btn.closest('.vrow');const k=rowKey(row);if(!k)return;
+  const val=row.querySelector('.vnote-ta').value.trim();
+  const cur=vocabNotes[k]||{};
+  if(val)cur.note=val;else delete cur.note;
+  if(cur.star||cur.note)vocabNotes[k]=cur;else delete vocabNotes[k];
+  saveVnotes();
+  closeNoteEdit(row,true);
 }
 function renderExtraVocab(){
   const box=document.getElementById('vocab');
@@ -1750,10 +1833,13 @@ function renderExtraVocab(){
     row.innerHTML='<div>'+escapeHtml(v.en)+'</div><div>'+escapeHtml(v.cn||v.en)+'</div>'
       +'<button class="vdel" type="button" title="删除该词汇">✕</button>';
     box.appendChild(row);
+    attachVocabRow(row);
     row.querySelector('.vdel').onclick=e=>{
       e.stopPropagation();
       row.remove();
       extraVocab.splice(idx,1);
+      const k=rowKey(row);
+      if(k&&vocabNotes[k]){delete vocabNotes[k];saveVnotes();}
       saveVocab();
       updateVmeta();
     };
@@ -1777,6 +1863,36 @@ function addVocab(){
 vaBtn.onclick=addVocab;
 vaEn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVocab();}});
 vaCn.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addVocab();}});
+/* 词汇区事件委托：星标 / 点击词进入解释编辑 / 保存 / 清除 / 取消 */
+const vocabBox=document.getElementById('vocab');
+vocabBox.addEventListener('click',e=>{
+  const star=e.target.closest('.vstar');
+  if(star){e.preventDefault();
+    const row=star.closest('.vrow');const k=rowKey(row);
+    if(k){const cur=vocabNotes[k]||{};cur.star=!cur.star;
+      if(cur.star||cur.note)vocabNotes[k]=cur;else delete vocabNotes[k];
+      saveVnotes();applyRowV(row);}
+    return;
+  }
+  const shownNote=e.target.closest(':scope .vnote');
+  if(shownNote){e.preventDefault();openNoteEdit(shownNote.closest('.vrow'));return;}
+  const word=e.target.closest('.vword');
+  if(word){e.preventDefault();const row=word.closest('.vrow');
+    if(row.querySelector('.vnote-edit'))closeNoteEdit(row,false);else openNoteEdit(row);
+    return;}
+  const save=e.target.closest('.vnote-save');
+  if(save){e.preventDefault();saveVocabNote(save);return;}
+  const clr=e.target.closest('.vnote-clear');
+  if(clr){e.preventDefault();const row=clr.closest('.vrow');const k=rowKey(row);
+    if(k){const cur=vocabNotes[k]||{};delete cur.note;
+      if(cur.star||cur.note)vocabNotes[k]=cur;else delete vocabNotes[k];
+      saveVnotes();closeNoteEdit(row,true);}
+    return;}
+  const can=e.target.closest('.vnote-cancel');
+  if(can){e.preventDefault();closeNoteEdit(can.closest('.vrow'),false);return;}
+});
+/* 静态预置词 + 已有手动词：统一挂上星标 / 解释能力 */
+document.querySelectorAll('#vocab .vrow').forEach(attachVocabRow);
 renderExtraVocab();
 updateVmeta();
 vq.oninput=()=>{
@@ -2179,7 +2295,7 @@ function syncReviewToggle(){
 function setSyncState(t){syncText=t;updateVmeta();}
 function schedulePush(){clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
 function pushToCloud(){
-  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta})})
+  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta,vnotes:vocabNotes})})
   .then(r=>r.ok?r.json():Promise.reject())
   .then(()=>setSyncState('☁ 已同步'))
   .catch(()=>setSyncState('⚠ 离线，改动暂存本机'));
@@ -2246,9 +2362,16 @@ async function loadFromCloud(){
           });
           if(!imgMeta[wk].length)delete imgMeta[wk];
         });
+        /* 词汇个性化（星标+专属解释）：合并云端 ∪ 本地（本地优先，保留刚编辑的） */
+        const cloudVn=(d.vnotes&&typeof d.vnotes==='object')?d.vnotes:{};
+        const mergedVn={};
+        Object.keys(cloudVn).forEach(k=>{mergedVn[k]=cloudVn[k];});
+        Object.keys(vocabNotes).forEach(k=>{mergedVn[k]=vocabNotes[k];});
+        vocabNotes=mergedVn;
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
         applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        document.querySelectorAll('#vocab .vrow').forEach(applyRowV);
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
         renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
@@ -2262,9 +2385,11 @@ async function loadFromCloud(){
         edits=(d.edits&&typeof d.edits==='object')?d.edits:{};
         calEvents=Array.isArray(d.calendar)?d.calendar:[];
         imgMeta=(d.images&&typeof d.images==='object')?d.images:{};
+        vocabNotes=(d.vnotes&&typeof d.vnotes==='object')?d.vnotes:{};
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
         applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        document.querySelectorAll('#vocab .vrow').forEach(applyRowV);
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
         renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
@@ -2273,7 +2398,7 @@ async function loadFromCloud(){
         pushToCloud();
         setSyncState('☁ 已同步');
       }
-    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length||calEvents.length||Object.keys(imgMeta).length){
+    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length||calEvents.length||Object.keys(imgMeta).length||Object.keys(vocabNotes).length){
       pushToCloud();
     }else{
       setSyncState('☁ 已同步');
@@ -2288,6 +2413,7 @@ function saveLocalAll(){
   try{localStorage.setItem(EDITS_KEY,JSON.stringify(edits));}catch(e){}
   try{localStorage.setItem(CAL_KEY,JSON.stringify(calEvents));}catch(e){}
   try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(e){}
+  try{localStorage.setItem(VN_KEY,JSON.stringify(vocabNotes));}catch(e){}
 }
 /* ===== 课堂笔记（本地 + 云端同步） ===== */
 const NOTE_KEY='com5104_notes';
