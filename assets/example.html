@@ -2448,7 +2448,7 @@ const IMGS_KEY='com5104_images';
 let imgMeta={};
 try{imgMeta=JSON.parse(localStorage.getItem(IMGS_KEY)||'{}');}catch(err){imgMeta={};}
 function saveImgMeta(){try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(err){}schedulePush();}
-const IDB_NAME='com5104_imgdb',IDB_STORE='imgs';
+const IDB_NAME='com5104_imgdb_v2',IDB_STORE='imgs';  /* v2：旧缓存里可能是双重 base64 的坏图，升级库名强制重拉 */
 let _idb=null;
 function idbOpen(){return new Promise((res,rej)=>{
   if(_idb)return res(_idb);
@@ -2480,23 +2480,30 @@ function compressImage(file){
   });
 }
 function pushImgCloud(id,dataUrl){
-  const body=dataUrl.split(',')[1];
-  return fetch('/api/image/'+id,{method:'PUT',headers:{'Content-Type':'image/jpeg'},body})
+  /* base64 → 二进制字节再上传（否则 R2 里存的是 base64 文本，另一端拉回后双重编码无法显示） */
+  const b64=dataUrl.split(',')[1];
+  const bin=atob(b64),bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return fetch('/api/image/'+id,{method:'PUT',headers:{'Content-Type':'image/jpeg'},body:bytes})
     .then(r=>r.ok?r.json():Promise.reject())
     .catch(()=>{setSyncState('⚠ 部分图片离线未上传');});
 }
 async function handleImgFiles(week,files){
   const list=imgMeta[week]||[];
+  const jobs=[];
   for(const f of [...files]){
     if(!f.type||!f.type.startsWith('image/'))continue;
-    try{
-      const dataUrl=await compressImage(f);
-      const id='i'+Date.now()+Math.random().toString(36).slice(2,8);
-      await idbPut(id,dataUrl);
-      list.push({id:id,name:f.name,time:new Date().toLocaleString('zh-CN',{hour12:false})});
-      pushImgCloud(id,dataUrl);
-    }catch(err){}
+    jobs.push((async()=>{
+      try{
+        const dataUrl=await compressImage(f);
+        const id='i'+Date.now()+Math.random().toString(36).slice(2,8);
+        await idbPut(id,dataUrl);
+        list.push({id:id,name:f.name,time:new Date().toLocaleString('zh-CN',{hour12:false})});
+        await pushImgCloud(id,dataUrl);   /* 先把图片传上 R2，全部完成后元数据才上云，避免另一端拉到「有元数据但图还没到」 */
+      }catch(err){}
+    })());
   }
+  await Promise.allSettled(jobs);
   imgMeta[week]=list;
   saveImgMeta();
   renderImgs(week);
@@ -2545,19 +2552,24 @@ function syncImgCache(){
   Object.keys(imgMeta).forEach(wk=>(imgMeta[wk]||[]).forEach(x=>{if(x&&x.id)ids.add(x.id);}));
   /* 清理本地 IndexedDB 中已被云端删除的图片 */
   idbAllKeys().then(keys=>{(keys||[]).forEach(k=>{if(!ids.has(k))idbDel(k);});}).catch(()=>{});
-  /* 拉取本设备缺失的图片 */
+  /* 拉取本设备缺失的图片；R2 最终一致 + 可能图片刚上传，404 时自动重试 3 次 */
   ids.forEach(id=>{
     idbGet(id).then(dataUrl=>{
       if(dataUrl)return;
-      fetch('/api/image/'+id)
-        .then(r=>{if(!r.ok)throw new Error('nf');return r.arrayBuffer();})
-        .then(buf=>{
-          const bytes=new Uint8Array(buf),chunks=[],CH=0x8000;
-          for(let i=0;i<bytes.length;i+=CH)chunks.push(String.fromCharCode.apply(null,bytes.subarray(i,i+CH)));
-          return idbPut(id,'data:image/jpeg;base64,'+btoa(chunks.join('')));
-        })
-        .then(()=>renderImgsAll())
-        .catch(()=>{});
+      const attempt=(n)=>{
+        fetch('/api/image/'+id)
+          .then(r=>{if(!r.ok)throw new Error('nf');return r.arrayBuffer();})
+          .then(buf=>{
+            const bytes=new Uint8Array(buf),chunks=[],CH=0x8000;
+            for(let i=0;i<bytes.length;i+=CH)chunks.push(String.fromCharCode.apply(null,bytes.subarray(i,i+CH)));
+            return idbPut(id,'data:image/jpeg;base64,'+btoa(chunks.join('')));
+          })
+          .then(()=>renderImgsAll())
+          .catch(()=>{
+            if(n<3)setTimeout(()=>attempt(n+1),1800*(n+1));
+          });
+      };
+      attempt(0);
     }).catch(()=>{});
   });
 }
