@@ -23,9 +23,11 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 .search input::placeholder{color:#9ca3af}
 .search>span{position:absolute;left:14px;top:9px;color:#9ca3af;font-size:20px}
 .gresults{position:absolute;top:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:8px;display:none;z-index:30}
+.gresults{max-height:430px;overflow-y:auto}
 .gresults .gr-total{font-size:12px;color:#6b7280;padding:5px 12px 8px;border-bottom:1px solid #f1f5f9;margin-bottom:6px}
-.gresults .gr-item{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:#374151}
+.gresults .gr-item{padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gresults .gr-item:hover{background:#f0fdf4;color:#16a34a}
+mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weight:600}
 .wrap{max-width:1400px;margin:auto;padding:24px;display:grid;grid-template-columns:220px 1fr 330px;gap:20px}
 .panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.08)}
 .side,.right{padding:16px;height:max-content;position:sticky;top:86px}
@@ -173,6 +175,90 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 .extra-form button:hover{background:#16a34a}
 .extra-del{flex:none;color:#d1d5db;font-size:12px;cursor:pointer;padding:2px 6px;border-radius:6px}
 .extra-del:hover{color:#ef4444;background:#fef2f2}
+/* ===== 富文本编辑（知识点 / 自建知识点 / 笔记） ===== */
+.ed-btn{flex:none;border:1px solid #e5e7eb;background:#fff;color:#6b7280;border-radius:7px;padding:2px 9px;font-size:12px;cursor:pointer;line-height:1.7;transition:all .15s;font-family:inherit}
+.ed-btn:hover{color:#16a34a;border-color:#22c55e;background:#f0fdf4}
+.topic.editing .ed-btn{display:none}
+.ed-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 12px;background:#f8fafc;border-bottom:1px solid #e5e7eb;border-radius:10px 10px 0 0;position:sticky;top:62px;z-index:10}
+.ed-toolbar button{min-width:32px;height:29px;border:1px solid #e5e7eb;background:#fff;border-radius:7px;font-size:13px;cursor:pointer;color:#374151;padding:0 9px;font-family:inherit;line-height:1;transition:all .12s}
+.ed-toolbar button:hover{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.ed-toolbar .ed-sep{width:1px;height:20px;background:#e5e7eb;margin:0 3px;flex:none}
+.ed-save{background:#22c55e!important;color:#fff!important;border-color:#22c55e!important;font-weight:700}
+.ed-save:hover{background:#16a34a!important}
+.ed-cancel{color:#6b7280!important}
+.ed-reset{color:#dc2626!important}
+.ed-pop{position:relative;display:inline-flex;align-items:center;gap:3px;border:1px solid #e5e7eb;background:#f9fafb;color:#374151;border-radius:8px;padding:4px 9px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1.4;user-select:none}
+.ed-pop:hover{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.ed-palette,.ed-pop{position:relative}
+.ed-palette .ed-colors,.ed-pop .ed-options{display:none;position:absolute;top:calc(100% + 5px);left:0;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:6px;z-index:40}
+.ed-palette.open .ed-colors{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.ed-pop.open .ed-options{display:flex;flex-direction:column;gap:4px;min-width:92px}
+.ed-colors button,.ed-options button{width:23px;height:23px;border-radius:6px;border:1px solid #e5e7eb;cursor:pointer;padding:0}
+.ed-pop .ed-options button{width:100%;height:auto;justify-content:flex-start;text-align:left;border:1px solid #e5e7eb;background:#fff;border-radius:7px;padding:5px 8px;font-size:12.5px;cursor:pointer;color:#374151;display:flex;align-items:center;gap:6px;min-width:0;font-family:inherit}
+.ed-pop .ed-options button:hover{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.ed-pop .ed-options.swatches{flex-direction:row;min-width:0}
+.ed-pop .ed-options.swatches button{width:26px;height:26px;padding:0;justify-content:center}
+.ed-swatch{display:inline-block;width:13px;height:13px;border-radius:4px;border:1px solid #e5e7eb;flex:none}
+/* 用户可插入的彩色框 */
+.ub-gray{border-left:3px solid #d1d5db;background:#f9fafb;color:#4b5563;border-radius:6px;padding:8px 12px;margin:8px 0}
+.ub-green{border-left:3px solid #22c55e;background:#f0fdf4;color:#047857;border-radius:6px;padding:8px 12px;margin:8px 0}
+.ub-blue{border-left:3px solid #2563eb;background:#eff6ff;color:#1e40af;border-radius:6px;padding:8px 12px;margin:8px 0}
+.ub-red{border-left:3px solid #dc2626;background:#fef2f2;color:#991b1b;border-radius:6px;padding:8px 12px;margin:8px 0}
+.ub-yellow{border-left:3px solid #f59e0b;background:#fffbeb;color:#92400e;border-radius:6px;padding:8px 12px;margin:8px 0}
+.body.editing{outline:2px solid #22c55e;outline-offset:-2px;border-radius:0 0 10px 10px;min-height:60px;cursor:text;background:#fff}
+.topic.editing .rev-ops{display:none}
+.note-edit{flex:none;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:6px}
+.note-edit:hover{color:#16a34a;background:#f0fdf4}
+.note-item.editing{border-color:#22c55e}
+.ed-body{flex:1 1 100%;outline:2px solid #22c55e;outline-offset:-2px;border-radius:8px;padding:8px 10px;min-height:44px;cursor:text;background:#fff}
+/* ===== 日程安排（中间主区大日历） ===== */
+.cal{margin-top:4px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px 20px}
+.cal-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cal-head b{flex:1;font-size:19px;color:#111827;font-weight:800}
+.cal-head button{flex:none;border:1px solid #e5e7eb;background:#fff;color:#4b5563;border-radius:9px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;line-height:1;font-family:inherit}
+.cal-head button:hover{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-wd{font-size:12px;color:#9ca3af;text-align:center;padding:6px 0;font-weight:700}
+.cal-cell{position:relative;text-align:center;font-size:14px;color:#374151;border-radius:10px;padding:10px 0 6px;cursor:pointer;border:1px solid #f3f4f6;background:#fafafa;min-height:56px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:4px}
+.cal-cell:hover{border-color:#22c55e;background:#f0fdf4}
+.cal-cell.other{color:#d1d5db;background:#fcfcfc}
+.cal-cell.today{background:#f0fdf4;color:#16a34a;font-weight:800;border-color:#22c55e}
+.cal-cell.sel{background:#22c55e;color:#fff;font-weight:800;border-color:#16a34a}
+.cal-cell.sel:hover{background:#16a34a}
+.cal-cell.sel .cal-dot{border:1px solid rgba(255,255,255,.7)}
+.cal-dots{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;min-height:8px;max-width:90%}
+.cal-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.cal-day{background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;margin-top:14px;padding:14px 16px;font-size:13.5px}
+.cal-day h6{margin:0 0 10px;font-size:15px;color:#065f46;font-weight:800}
+.cal-ev{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;margin-bottom:6px;font-size:13.5px;background:#fff;color:#374151;border:1px solid #f3f4f6}
+.cal-ev .cal-c{width:11px;height:11px;border-radius:4px;flex:none}
+.cal-ev b{flex:1;font-weight:700}
+.cal-ev .cal-del{border:none;background:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:0 5px;border-radius:6px}
+.cal-ev .cal-del:hover{color:#ef4444;background:#fef2f2}
+.cal-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.cal-add input{flex:1 1 240px;border:1px solid #e5e7eb;border-radius:9px;padding:9px 12px;font-size:13.5px;font-family:inherit;box-sizing:border-box}
+.cal-add input:focus{outline:none;border-color:#22c55e}
+.cal-add select{border:1px solid #e5e7eb;border-radius:9px;font-size:13px;padding:8px;color:#374151;font-family:inherit}
+.cal-add button{background:#22c55e;color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.cal-add button:hover{background:#16a34a}
+.cal-empty{font-size:13px;color:#9ca3af;padding:6px 2px}
+.cal-note{font-size:12px;color:#9ca3af;margin-top:12px;line-height:1.8;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cal-note .cal-dot{margin:0 2px}
+.c-red{background:#dc2626}.c-orange{background:#f59e0b}.c-blue{background:#2563eb}.c-green{background:#22c55e}.c-purple{background:#8b5cf6}
+/* ===== 其他知识点 · 图片上传区 ===== */
+.img-zone{margin-top:14px;border:1.5px dashed #d1d5db;border-radius:12px;padding:12px;background:#fff}
+.img-bar{font-weight:700;font-size:13px;color:#374151;margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.img-drop{border:2px dashed #d1d5db;border-radius:10px;padding:14px;text-align:center;color:#6b7280;font-size:12.5px;cursor:pointer;background:#f9fafb;transition:all .15s}
+.img-drop:hover,.img-drop.over{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:10px}
+.img-card{position:relative;border-radius:9px;overflow:hidden;border:1px solid #e5e7eb;background:#fff}
+.img-card img{width:100%;height:74px;object-fit:cover;display:block;cursor:zoom-in}
+.img-card .img-del{position:absolute;top:4px;right:4px;border:none;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1}
+.img-card .img-del:hover{background:rgba(220,38,38,.85)}
+.img-status{font-size:11px;color:#9ca3af;margin-top:8px}
+.img-lb{position:fixed;inset:0;background:rgba(15,23,42,.88);z-index:100;display:none;align-items:center;justify-content:center;cursor:zoom-out;padding:24px}
+.img-lb.open{display:flex}
+.img-lb img{max-width:92vw;max-height:92vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .empty{display:none;text-align:center;color:#9ca3af;padding:40px}
 @media(max-width:1050px){.wrap{grid-template-columns:190px 1fr}.right{display:none}}
 /* ===== 手机端适配（仅屏幕宽度 <700px 时生效，桌面端布局完全不受影响） ===== */
@@ -217,6 +303,8 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 .extra-zone{padding:12px}
 .extra-hint{font-size:11.5px}
 .gresults .gr-total,.gresults .gr-item{font-size:13px}
+.ed-toolbar{position:static;top:auto}
+.ed-toolbar button{min-width:30px;padding:0 7px}
 }</style>
 </head>
 <body>
@@ -238,7 +326,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <summary>📚 Weeks 1 – 6</summary>
 <a class="page-link" data-page="week1" href="#week1"><b class="wk-no">Week 1</b> · Basic Elements of Research</a>
 <a class="page-link" data-page="week2" href="#week2"><b class="wk-no">Week 2</b> · Research Methods</a>
-<a class="page-link" data-page="week3" href="#week3"><b class="wk-no">Week 3</b> · TBA</a>
+<a class="page-link" data-page="week3" href="#week3"><b class="wk-no">Week 3</b> · Sampling Methods</a>
 <a class="page-link" data-page="week4" href="#week4"><b class="wk-no">Week 4</b> · TBA</a>
 <a class="page-link" data-page="week5" href="#week5"><b class="wk-no">Week 5</b> · TBA</a>
 <a class="page-link" data-page="week6" href="#week6"><b class="wk-no">Week 6</b> · TBA</a>
@@ -247,6 +335,7 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <a class="page-link" data-page="must" href="#must">⭐ 必背</a>
 <a class="page-link" data-page="review" href="#review">📋 复习清单</a>
 <a class="page-link" data-page="notes" href="#notes">📝 课堂笔记</a>
+<a class="page-link" data-page="calendar" href="#calendar">📅 日程安排</a>
 </aside>
 
 <main class="main">
@@ -258,8 +347,9 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 ① 左侧目录切换页面，知识点可展开 / 收起；每个 Week 页面的「全部展开 / 全部收起」按钮可一次控制。<br>
 ② 顶部搜索框 = <b>全局搜索</b>；每个 Week 页面右上角有<b>局部搜索框</b>；右侧单词表有独立<b>小搜索框</b>。<br>
 ③ <b>复习清单：</b>勾选多个知识点 → 底部悬浮条「加入复习清单」一键全部加入；在「📋 复习清单」页点击条目直接展开详情，学会后点 <b>Know</b> 移出。<br>
-④ <b>上课随手记：</b>右侧词汇表可输入「英文 + 中文」<b>手动添加单词</b>；每个 Week 页底部「📌 其他知识点」可添加老师补充的知识点；「📝 课堂笔记」页可随时记录整段笔记。<br><br>
-<b>颜色说明：</b><span class="term">绿色加粗</span> = 核心术语 · <b>深色加粗</b> = 重点结论 · <span style="background:#f9fafb;border-left:3px solid #d1d5db;color:#4b5563;padding:1px 8px;border-radius:4px">灰蓝框</span> = 例子 · <span style="background:#f0fdf4;border-left:3px solid #22c55e;color:#047857;padding:1px 8px;border-radius:4px">绿框</span> = 记忆技巧
+④ <b>上课随手记：</b>右侧词汇表可输入「英文 + 中文」<b>手动添加单词</b>；每个 Week 页底部「📌 其他知识点」可添加老师补充的知识点；「📝 课堂笔记」页可随时记录整段笔记。<br>
+⑤ <b>✎ 编辑：</b>每个知识点、自建知识点和笔记右上角都有「✎ 编辑」按钮——选中文字后可 <b>加粗</b>、<b>高亮</b>、<b>下划线</b>、<b>改颜色</b>，点「保存」后<b>任何设备打开都是同一份</b>；「恢复默认」还原为初始内容。<br><br>
+<b>颜色说明：</b><span class="term">绿色加粗</span> = 核心术语 · <b>深色加粗</b> = 重点结论 · <span style="background:#f9fafb;border-left:3px solid #d1d5db;color:#4b5563;padding:1px 8px;border-radius:4px">灰蓝框</span> = 例子 · <span style="background:#f0fdf4;border-left:3px solid #22c55e;color:#047857;padding:1px 8px;border-radius:4px">绿框</span> = 记忆技巧 · <mark style="background:#fde68a;padding:1px 6px;border-radius:4px">黄底</mark> = 自定高亮
 </div>
 </div>
 </div>
@@ -600,7 +690,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week1">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week1"></span></div>
+<div class="img-drop" id="img-drop-week1" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week1" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week1"></div>
+<div class="img-status" id="img-status-week1"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -770,7 +868,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week2">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week2"></span></div>
+<div class="img-drop" id="img-drop-week2" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week2" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week2"></div>
+<div class="img-status" id="img-status-week2"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -783,7 +889,272 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <div class="local-search"><span>⌕</span><input class="ls" placeholder="搜索本周知识点……" autocomplete="off"></div>
 </div>
 </div>
-<details class="panel topic" data-wk="week3" data-k="week3 待添加"><summary><span class="sum-txt">Week 3 · TBA</span></summary><div class="body">把 Week 3 PPT 内容加入这里即可。</div></details>
+<details class="panel topic" data-wk="week3" data-k="why sample sampling time cost accuracy 为什么抽样 时间 成本 准确性">
+<summary><span class="sum-txt">1. Why Sample?：为什么要抽样</span></summary>
+<div class="body">
+<p>既然要研究总体（population），为什么不用<b>全部人</b>的数据，而是只抽一部分？因为对研究人员来说，收集<b>整个总体</b>的数据通常<b>不现实、也不可能</b>（impractical / impossible）。</p>
+<p><span class="key-point">抽样的三大原因（REASONS FOR SAMPLING）：</span></p>
+<ul>
+<li><span class="term">Time（时间）</span>：问遍所有人太耗时，抽样能快速拿到数据。</li>
+<li><span class="term">Cost（成本）</span>：接触全部总体太贵，抽样省钱省人力。</li>
+<li><span class="term">Accuracy（准确性）</span>：样本量可控、调查更细致，反而可能比粗糙的全量调查更准确。</li>
+</ul>
+<div class="example"><b>例子：</b>做全香港大学生的睡眠调查——不可能给几十万学生每人发问卷，所以随机抽 1000 人，用 1000 人的数据去估计全体，又快又省，误差还能算出来。</div>
+<div class="tip">💡 记忆：抽样 = 省时间 + 省钱 + 更准，一石三鸟。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="nonprobability sampling probability sampling random selection 非概率抽样 概率抽样 随机选择">
+<summary><span class="sum-txt">2. Nonprobability vs Probability：两大抽样方法</span></summary>
+<div class="body">
+<p>所有抽样方法分成两大类，判断标准是：<b>选谁进样本，靠不靠概率论</b>。</p>
+<p><span class="term">Nonprobability Sampling（非概率抽样）</span>：用<b>概率论之外</b>的方式选样本（靠方便、靠判断、靠推荐）。总体每个元素被选中的概率：<span class="key-point">(a) 为零 (b) 未知 (c) 不相等</span>。</p>
+<p><span class="term">Probability Sampling（概率抽样）</span>：<b>依据概率论</b>、包含<b>随机选择机制</b>选样本（如抽签、掷骰子）。总体每个元素被选中的概率：<span class="key-point">(a) 非零 (b) 已知 (c) 相等</span>。</p>
+<div class="example"><b>类比：</b>非概率抽样像<b>「手挑苹果」</b>——看哪个顺眼拿哪个，全凭主观；概率抽样像<b>「掷骰子」</b>——每个面机会均等，全凭随机。</div>
+<div class="tip">💡 记忆：概率抽样三关键词 = 非零 + 已知 + 相等（non-zero, known, equal）。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="convenience sampling reliance on available subjects haphazard sampling street interviews 便利抽样">
+<summary><span class="sum-txt">3. Convenience Sampling：便利抽样</span></summary>
+<div class="body">
+<p><span class="term">Convenience Sampling（便利抽样）</span>：谁<b>方便</b>就找谁，逮到谁算谁。别称：<span class="term">reliance on available subjects（依赖现成对象）</span> 或 <span class="term">haphazard sampling（随意抽样）</span>。</p>
+<p><span class="key-point">风险（Risky）：</span>对样本的<b>代表性（representativeness）没有任何控制</b>——你找到的人很可能不能代表总体。</p>
+<div class="example"><b>例子：</b>在街头随便拦住路人做访谈（street interviews）——拦到的多半是那天恰好在街上的人，可能偏年轻、偏空闲，不能代表全体市民。</div>
+<div class="tip">💡 记忆：便利 = 怎么方便怎么来，最省事但最不靠谱，风险在「控制不了代表性」。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="purposive sampling judgmental sampling researcher judgement 判断抽样">
+<summary><span class="sum-txt">4. Purposive / Judgmental Sampling：判断抽样</span></summary>
+<div class="body">
+<p><span class="term">Purposive（Judgmental）Sampling（判断抽样）</span>：由研究者<b>凭自己的判断</b>，挑选「最有用、最能回答问题」的对象进入样本。</p>
+<p>它靠的是研究者对研究对象的专业了解——<b>我认为这些人最合适</b>，就选他们。</p>
+<div class="example"><b>例子：</b>研究香港大学足球 CCA（社团）成员的参与动机——不需要随机抽全校学生，直接判断并锁定足球 CCA 成员来调查，因为他们才是有信息量的对象。</div>
+<div class="tip">💡 记忆：判断抽样 = 「专家挑人」，挑最有代表性的那批，省力但有主观性。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="snowball sampling referral network hidden population 滚雪球抽样 推荐 隐蔽人群">
+<summary><span class="sum-txt">5. Snowball Sampling：滚雪球抽样</span></summary>
+<div class="body">
+<p><span class="term">Snowball Sampling（滚雪球抽样）</span>：先找到第一批受访者，然后请<b>每一位受访者推荐下一位</b>可以访谈的人——像滚雪球一样越滚越大。</p>
+<p>非常适合<b>难以接触、隐藏的人群</b>（hidden populations）：不靠圈内人推荐，你根本找不到他们。</p>
+<div class="example"><b>例子：</b>研究戒毒康复者——不可能拿到官方名单，就先访谈 1 位康复者，再请他介绍认识的康复朋友，朋友再介绍朋友，样本像雪球一样滚起来。</div>
+<div class="tip">💡 记忆：滚雪球 = 熟人推荐熟人，专治「找不到人」的研究对象。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="quota sampling prespecified characteristics hong kong ethnic groups 配额抽样 预设特征">
+<summary><span class="sum-txt">6. Quota Sampling：配额抽样</span></summary>
+<div class="body">
+<p><span class="term">Quota Sampling（配额抽样）</span>：按<b>预先指定的特征</b>（如性别、年龄、族裔）来选人，让样本里各特征的<b>比例分布</b>与总体<b>假定的分布一致</b>。</p>
+<p>注意：配额内具体选谁，通常还是靠便利——所以它仍然属于<b>非概率抽样</b>。</p>
+<div class="example"><b>课堂例子（香港族群构成）：</b>香港人口约 <b>Chinese 华人 91.6%</b>、少数族裔 <b>8.4%</b>（其中 Filipinos 菲律宾人 32.5%、Indonesians 印尼人 22.9%、South Asians 南亚人 16.5%、Mixed 混血 10.8%、Whites 白人 9.9%）。配额抽样就按这些比例去凑样本：每找 100 人，大约 92 个华人、8 个少数族裔。</div>
+<div class="tip">💡 记忆：配额 = 按「配方表」凑人头，比例像总体，但人选随意。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="nonprobability downsides generalize biased 非概率抽样缺点 推广 偏差">
+<summary><span class="sum-txt">7. 非概率抽样的缺点（Downsides）</span></summary>
+<div class="body">
+<p><span class="key-point">非概率抽样两大缺点：</span></p>
+<ul>
+<li><b>无法把结果推广到总体</b>（Unable to generalize results to the population）：样本不代表总体，结论只能说明「这批人」。</li>
+<li><b>结果可能有偏</b>（Results may be biased）：选人不随机，系统性地偏向某一类人，估计值会偏离真实值。</li>
+</ul>
+<div class="example"><b>例子：</b>只用便利抽样调查「大家都支持某政策」，但受访者全是校园学生——结论无法代表全体市民，而且明显偏向年轻人的观点。</div>
+<div class="tip">💡 记忆：非概率抽样两大坑 = 不能推广 + 可能偏。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="element population study population sampling frame sampling unit 关键术语 元素 总体 研究总体 抽样框 抽样单位">
+<summary><span class="sum-txt">8. 抽样关键术语（上）：Element / Population / Frame / Unit</span></summary>
+<div class="body">
+<ul>
+<li><span class="term">Element（元素）</span>：构成总体的<b>基本单位</b>，也是被选入样本的单位。例：一个人。</li>
+<li><span class="term">Population（总体）</span>：研究中<b>理论上规定</b>的全部元素的集合。例：全香港的大学生。</li>
+<li><span class="term">Study population（研究总体）</span>：<b>实际从中抽样</b>的那部分元素集合（比理论总体更具体、更可操作）。</li>
+<li><span class="term">Sampling frame（抽样框）</span>：包含总体所有单位的<b>名单或准名单</b>，抽样从名单里抽。例：学生注册名单。</li>
+<li><span class="term">Sampling unit（抽样单位）</span>：在抽样<b>某一阶段</b>被考虑选入的单位（可能是单个元素，也可能是一组元素）。</li>
+</ul>
+<div class="example"><b>串起来理解：</b>你要研究「香港大学生」（Population）→ 实际你只能拿到「某大学的学生注册名单」（Sampling frame）→ 名单上的学生构成 Study population → 名单里每个学生是 Element → 你按班级抽（班级就是 Sampling unit）。</div>
+<div class="tip">💡 记忆：总体是「理想」，抽样框是「现实名单」；抽样框覆盖不全，样本就代表不了理想总体。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="parameters sample statistics representativeness inferential stats 参数 样本统计量 代表性">
+<summary><span class="sum-txt">9. 抽样关键术语（下）：Parameters / Statistics / Representativeness</span></summary>
+<div class="body">
+<ul>
+<li><span class="term">Parameters（参数）</span>：<b>总体</b>中某个变量的概括性描述。例：全港大学生平均年龄（真实值，通常不知道）。</li>
+<li><span class="term">Sample statistics（样本统计量）</span>：<b>样本</b>中某个变量的概括性描述。例：抽 1000 人算出的平均年龄——用它去估计总体参数。</li>
+<li><span class="term">Representativeness（代表性）</span>：样本具有与总体<b>相同的特征分布</b>的性质——样本像总体的「缩小版」。</li>
+</ul>
+<p><span class="key-point">代表性的三个好处（为什么重要）：</span></p>
+<ul>
+<li>由<b>概率抽样</b>增强（Enhanced by probability sampling）；</li>
+<li>允许更大程度地<b>推广结论</b>（greater generalizability）；</li>
+<li>可以使用<b>推断统计</b>（inferential stats）从样本推总体。</li>
+</ul>
+<div class="example"><b>例子：</b>总体男女比 50:50，一个好样本也应该接近 50:50——这就是代表性；有了它，你才能放心用样本数据推断总体。</div>
+<div class="tip">💡 记忆：参数 = 总体的真值（未知）；统计量 = 样本的估计（已知）；代表性 = 样本像总体。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="sample distribution sampling distribution population distribution 三种分布 样本分布 抽样分布 总体分布">
+<summary><span class="sum-txt">10. 三种分布：Sample / Sampling / Population</span></summary>
+<div class="body">
+<p>统计学里「分布」是描述数据长什么样的概念，有三种层次，别搞混：</p>
+<ul>
+<li><span class="term">Sample distribution（样本分布）</span>：<b>一个样本</b>的特征。例：抽 1000 人，55% 男、45% 女，平均年龄 40。</li>
+<li><span class="term">Sampling distribution（抽样分布）</span>：<b>很多个样本</b>（反复抽样）的统计量分布。例：反复抽 1000 人算 100 次平均年龄，这 100 个平均数本身的分布。</li>
+<li><span class="term">Population distribution（总体分布）</span>：<b>整个总体</b>的特征。</li>
+</ul>
+<div class="example"><b>例子：</b>班级一次测验成绩分布 = 总体分布；你随机抽 10 人算平均分 = 样本分布；把「抽 10 人算平均分」重复 50 次，这 50 个平均分的分布 = 抽样分布。</div>
+<div class="tip">💡 记忆：1 个样本 → 样本分布；很多样本 → 抽样分布；所有人 → 总体分布。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="logic probability sampling bias representativeness random selection sampling error 概率抽样逻辑">
+<summary><span class="sum-txt">11. 概率抽样的逻辑（Logic）：为什么它靠谱</span></summary>
+<div class="body">
+<p>概率抽样之所以「高级」，因为它同时解决四个问题：</p>
+<ol>
+<li><b>减少抽样偏差</b>（Reduces conscious &amp; subconscious sampling bias）：随机选人，避免有意/无意只挑「看起来典型」的人。</li>
+<li><b>保证代表性</b>（Ensures representativeness）：样本特征分布与总体一致。</li>
+<li><b>随机选择</b>（Random selection）：每个元素被选中机会相等，且与其他事件独立。</li>
+<li><b>提供估计基础</b>：用概率论 + 抽样分布 + 抽样误差，<b>从样本估计总体参数</b>——误差可以算出来。</li>
+</ol>
+<div class="example"><b>例子：</b>为什么民调抽 1000 人就能预测大选？因为概率抽样保证这 1000 人像总体的缩影（代表性），并且误差 ±3% 可以算出来（第 4 点）。</div>
+<div class="tip">💡 记忆：概率抽样四连 = 减偏差 + 保代表 + 随机选 + 误差可算。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="sample size matters sampling distribution example 样本量 均值 收敛">
+<summary><span class="sum-txt">12. Sample Size Matters：样本量重要</span></summary>
+<div class="body">
+<p>核心结论一句话：<span class="key-point">样本量越大，样本均值越接近总体真实均值</span>（SAMPLE SIZE MATTERS!）。</p>
+<p>用教材例子（10 个人的钱，真实均值 $4.50）说明：</p>
+<ul>
+<li>每次只抽 <b>1 个人</b>（10 个样本）：均值从 $0 到 $9 全都有，<b>极端、分散</b>，误差很大；</li>
+<li>每次抽 <b>2 个人</b>（45 个样本）：不会再出现 $0 或 $9 这种极端值，估计<b>开始向 $4.50 聚集</b>；</li>
+<li>样本量继续增大（3、4……）：分布<b>越来越窄、越来越集中在真实值附近</b>。</li>
+</ul>
+<div class="tip">💡 记忆：样本量是「质量开关」——越大，估计越稳、越准；这就是为什么 Assignment 建议样本量尽量大。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="sampling error margin of error pew 抽样误差 误差边际">
+<summary><span class="sum-txt">13. Sampling Error &amp; Margin of Error：抽样误差与误差边际</span></summary>
+<div class="body">
+<p><span class="term">Sampling error（抽样误差）</span>：概率抽样中<b>可预期的误差程度</b>——因抽样「碰巧」产生的随机变异性（sampling 本身带来的波动）。</p>
+<p><span class="term">Margin of error（误差边际，MOE）</span>：误差边际描述「<b>调查结果离总体真实值可能有多近</b>」。</p>
+<p><span class="key-point">影响 MOE 的因素：</span>① 样本量（sample size）② 概率抽样设计（probability sampling design）。</p>
+<p><span class="key-point">不影响 MOE 的（反直觉！）：</span>总体规模（Size of population）——10 万人的总体和 1000 万人的总体，同样样本量下误差边际几乎一样。</p>
+<div class="example"><b>Pew 官方解释：</b>「±3 个百分点、95% 置信水平」意味着：如果同样的调查做 100 次，有 95 次结果会落在真实值 ±3 个百分点以内（Pew Research Centre, 2016）。</div>
+<div class="tip">💡 记忆：误差看「样本量」不看「总体大小」——别以为总体越大就要抽越多（到一定程度就饱和了）。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="confidence level confidence interval 1.96 置信水平 置信区间">
+<summary><span class="sum-txt">14. Confidence Level &amp; Interval：置信水平与置信区间</span></summary>
+<div class="body">
+<p><span class="term">Confidence level（置信水平）</span>：总体参数<b>落在给定置信区间内</b>的估计概率（通常对应 1.96 个标准差，即 95%）。</p>
+<p><span class="term">Confidence interval（置信区间）</span>：<b>总体参数被估计所在的值域</b>（范围）。</p>
+<div class="example"><b>例子：</b>「35% 的选民支持候选人 A，95% 置信水平，误差 ±3%」→ 置信区间 = <b>32% 到 38%</b>——也就是说，我们有 95% 的把握认为候选人 A 的真实支持率在 32%~38% 之间。</div>
+<div class="tip">💡 记忆：置信水平 = 有多有信心（95%）；置信区间 = 信心覆盖的范围（32%-38%）；MOE = 区间半径（±3%）。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="calculating margin of error formula z critical value 计算误差边际 公式">
+<summary><span class="sum-txt">15. Calculating MOE：误差边际怎么算</span></summary>
+<div class="body">
+<p>公式：<span class="key-point">Margin of Error = Z × √(P × Q / n)</span></p>
+<p>变量说明：</p>
+<ul>
+<li>两个类别：<b>p</b>（支持比例）vs <b>q</b>（不支持比例），<b>p + q = 1</b>；</li>
+<li>保守假设 <b>p = q = 0.50</b>（比例最不确定时误差最大）；</li>
+<li><b>n</b> = 样本量；</li>
+<li><b>Z</b> = 临界值（Critical value），通常取 <b>1.96</b>（对应 95% 置信水平）。</li>
+</ul>
+<div class="example"><b>计算：</b>p=q=0.5，n=1000，Z=1.96 → MOE = 1.96 × √(0.5×0.5/1000) ≈ 0.03 = <b>3%</b>。所以「1000 人、95% 置信水平」的标准说法就是「±3 个百分点」。</div>
+<div class="tip">💡 记忆：MOE = Z × √(pq/n)，三个输入：置信水平（Z）、最保守比例（0.5）、样本量（n）。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="calculating sample size formula 1067 384 diminishing returns 计算样本量 收益递减">
+<summary><span class="sum-txt">16. Calculating Sample Size：样本量怎么算</span></summary>
+<div class="body">
+<p>把 MOE 公式反过来，就是算样本量：<span class="key-point">N = [Z² × p × q] / (margin of error)²</span></p>
+<ul>
+<li>95% 置信水平：<b>N = [1.96² × p × q] / (MOE)²</b></li>
+<li>99% 置信水平：<b>N = [2.576² × p × q] / (MOE)²</b></li>
+</ul>
+<div class="example"><b>课堂练习答案（95%，p=q=0.5）：</b>MOE=3% → N=1067；MOE=5% → N=384。对照表：1%→9604 · 2%→2401 · 3%→1067 · 4%→600 · 5%→384 · 6%→267 · 7%→196。</div>
+<p><span class="key-point">收益递减（Diminishing returns）：</span>样本量与误差边际是<b>反比关系</b>——样本量越大误差越小，但收益越来越小：1000 人 → MOE≈3.1%，2000 人 → MOE≈2.2%，再往上加人，误差降得很慢。</p>
+<div class="tip">💡 记忆：想要误差减半，样本量要翻 4 倍（因为公式里 MOE 是平方项）——所以别盲目堆样本量。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="simple random sampling sampling frame random 简单随机抽样">
+<summary><span class="sum-txt">17. Simple Random Sampling：简单随机抽样</span></summary>
+<div class="body">
+<p><span class="term">Simple Random Sampling（简单随机抽样）</span>：给总体的每个单位<b>编号</b>，然后用随机方法（抽签/随机数表）选出样本——每个单位被抽中的机会完全相等。</p>
+<p><span class="key-point">操作步骤（How to go about it）：</span></p>
+<ol>
+<li>确定<b>抽样框</b>（sampling frame，全体名单）；</li>
+<li>确定<b>样本量</b>；</li>
+<li><b>随机</b>抽取元素。</li>
+</ol>
+<div class="example"><b>例子：</b>班级名单（class list）给每个学生一个唯一编号，然后用随机数表抽 20 个号——被抽到的 20 名学生就是样本。</div>
+<div class="tip">💡 记忆：简单随机 = 编号 + 抽签，最「公平」的抽样，但前提是名单（抽样框）要全。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="systematic sampling periodicity sampling interval sampling ratio 系统抽样 周期性">
+<summary><span class="sum-txt">18. Systematic Sampling：系统抽样</span></summary>
+<div class="body">
+<p><span class="term">Systematic Sampling（系统抽样）</span>：在名单里<b>每隔 k 个选一个</b>（every kth unit）。</p>
+<p><span class="term">Sampling interval（抽样间隔）</span>：选人之间的标准距离 k（例：每第 3 个选 1 个，k=3）。</p>
+<p><span class="term">Sampling ratio（抽样比率）</span>：被选入样本的元素占总体的比例。</p>
+<p><span class="key-point">操作步骤：</span>① 确定抽样框 ② <b>检查名单是否有周期性风险（periodicity）</b>——名单若呈循环模式且与抽样间隔巧合，会系统性偏斜 ③ 确定抽样间隔与比率 ④ 随机起点，之后每隔 k 个选一个。</p>
+<div class="example"><b>例子：</b>每隔第 3 栋房子抽 1 户（System every 3rd house）。</div>
+<div class="tip">💡 记忆：系统抽样 = 「每隔 k 个挑一个」，最怕名单有周期（比如名单按夫妻成对排列，隔 2 抽 1 就全是丈夫/全是妻子）。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="stratified sampling strata homogeneous 分层抽样 层 同质">
+<summary><span class="sum-txt">19. Stratified Sampling：分层抽样</span></summary>
+<div class="body">
+<p><span class="term">Stratified Sampling（分层抽样）</span>：先按某个特征把总体分成<b>同质的组（strata 层）</b>，再在<b>每一层内部随机抽样</b>。</p>
+<p><span class="key-point">要点：</span></p>
+<ul>
+<li>抽样前先把总体分成同质组（homogeneous groups / strata）；</li>
+<li>每组内部<b>随机</b>选单位；</li>
+<li>各层的<b>样本比例应与总体比例匹配</b>；</li>
+<li>因为层内同质，能<b>降低抽样误差</b>。</li>
+</ul>
+<div class="example"><b>例子（课堂）：</b>全校 10,000 人、抽 1,000 人，按院系分层：Media &amp; Com 500 人 → 抽 50；Chinese &amp; History 1,500 → 抽 150；English 2,000 → 抽 200；Social &amp; Behavioural Sciences 6,000 → 抽 600。每层都按 10% 抽，比例与总体完全一致。</div>
+<div class="tip">💡 记忆：分层 = 「先分组再组内抽」，保证每个群体都被覆盖到，误差更小。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="cluster sampling multistage cluster sampling 整群抽样 多阶段">
+<summary><span class="sum-txt">20. Cluster Sampling：整群抽样（含多阶段）</span></summary>
+<div class="body">
+<p><span class="term">Cluster Sampling（整群抽样）</span>：当<b>无法/难以列出全部元素名单</b>时使用——先抽「群」，再调查选中群里的<b>所有成员</b>。</p>
+<p><span class="key-point">操作步骤：</span>① 获取<b>集群名单</b>（如教堂、清真寺、寺庙）② 从名单中<b>随机抽取集群</b> ③ 对选中的集群，调查<b>该集群的全部成员</b>。</p>
+<p><span class="term">Multistage cluster sampling（多阶段整群抽样）</span>：先抽自然群组，再对选中群组的成员<b>进一步二次抽样</b>（不是全查，而是再抽一部分）。</p>
+<div class="example"><b>例子（中国医院研究）：</b>把中国 31 省分成 6 大区域 → 每区随机抽医院（125 三级 + 125 二级）→ 再按意愿/能力筛选到约 25+25 家 → 2017.6-2018.4 连续纳入门诊患者 → 共约 5,000 名患者。</div>
+<div class="tip">💡 记忆：整群 = 「先抽群，群内全查」（或再抽一层=多阶段）；分层是「每层都抽」，整群是「只抽几群」。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="probability proportionate to size pps disproportionate sampling weighting oversample 概率与规模成比例 不等比例 加权">
+<summary><span class="sum-txt">21. PPS &amp; 不等比例抽样：保证「少数群体」不被漏掉</span></summary>
+<div class="body">
+<p><span class="term">PPS（Probability Proportionate to Size，概率与规模成比例）</span>：多阶段整群抽样的一种——集群不是<b>等概率</b>被选中，而是<b>按规模成比例</b>地被选中（规模 = 要抽的单位数）。</p>
+<p><span class="key-point">为什么要 PPS：</span>如果纯随机抽样，人口密集的少数街区很容易被漏掉 → 这些区域的家庭<b>代表性不足</b>。</p>
+<div class="example"><b>例子：</b>城市一半人住在 10 个高密度街区，其余人散在 990 个街区——纯随机抽 100 个街区，很可能 10 个高密度街区一个都没抽到！PPS 让大街区有更大的被抽概率。例：1,000 个街区 → 随机抽 100 个 → 从选中的 10 个街区各随机抽 1 户。</div>
+<p><span class="term">Disproportionate sampling &amp; weighting（不等比例抽样与加权）</span>：有时对总体的某些亚群体（如少数族裔）<b>故意多抽（oversample）</b>，保证分析时有足够的案例数，分析时再<b>加权（weigh）</b>还原总体比例。</p>
+<div class="example"><b>香港研究例子：</b>总样本 1,000：华人 910 + 少数族裔 90——少数族裔太少没法单独分析，所以可能需要 oversample 少数族裔（多抽一些），分析时再加权。</div>
+<div class="tip">💡 记忆：PPS = 大群多抽（按大小给机会）；不等比例 = 弱者多抽 + 分析加权。</div>
+</div>
+</details>
+<details class="panel topic" data-wk="week3" data-k="quiz 1 测验 下周 3.10pm 30 mins 20 questions mcq true false 考试 提醒">
+<summary><span class="sum-txt">📌 Quiz 1 提醒（下节）</span></summary>
+<div class="body">
+<p><span class="key-point">下周 Quiz 1，提前准备：</span></p>
+<ul>
+<li>提前到场，<b>3:10pm 准时开始</b>（SHARP）；</li>
+<li><b>30 分钟 / 20 题</b>，题型 = MCQ 单选 + True-False 判断；</li>
+<li>带自己的 <b>laptop / iPad / tablet</b>（记得<b>不要换设备</b>！）；</li>
+<li>Mock-quiz 需用 Respondus LockDown Browser 访问。</li>
+</ul>
+<div class="tip">💡 覆盖 Week 1-3：重点过一遍本周的抽样概念 + 前三周必背清单。</div>
+</div>
+</details>
 <div class="extra-zone">
 <div class="extra-bar">📌 其他知识点 <span class="extra-count"></span></div>
 <div class="extra-hint">老师上课补充的内容会显示在这里，与本页知识点并列，可直接展开查看、加入复习清单。</div>
@@ -793,7 +1164,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week3">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week3"></span></div>
+<div class="img-drop" id="img-drop-week3" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week3" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week3"></div>
+<div class="img-status" id="img-status-week3"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -816,7 +1195,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week4">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week4"></span></div>
+<div class="img-drop" id="img-drop-week4" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week4" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week4"></div>
+<div class="img-status" id="img-status-week4"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -839,7 +1226,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week5">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week5"></span></div>
+<div class="img-drop" id="img-drop-week5" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week5" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week5"></div>
+<div class="img-status" id="img-status-week5"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -862,7 +1257,15 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <textarea class="extra-body" rows="2" placeholder="详细内容（支持多行）……"></textarea>
 <button type="submit">＋ 添加</button>
 </form>
+<div class="img-zone" data-week="week6">
+<div class="img-bar">🖼 课堂图片 <span class="img-count" id="img-count-week6"></span></div>
+<div class="img-drop" id="img-drop-week6" title="拖拽图片到这里，或点击选择本地图片">拖拽图片到这里，或点击选择本地图片（自动压缩，云端同步）</div>
+<input type="file" id="img-file-week6" accept="image/*" multiple style="display:none">
+<div class="img-grid" id="img-grid-week6"></div>
+<div class="img-status" id="img-status-week6"></div>
 </div>
+</div>
+
 <div class="week-empty empty">本周没有匹配内容。</div>
 </section>
 
@@ -972,9 +1375,28 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 </div>
 </details>
 
-<details class="panel topic" data-wk="must" data-k="week3 must 必背 待添加">
+<details class="panel topic" data-wk="must" data-k="week3 must 必背 sampling nonprobability probability quota cluster systematic stratified sample size margin of error">
 <summary><span class="sum-txt">Week 3 必背</span></summary>
-<div class="body">Week 3 内容补充后，把必背考点加在这里。</div>
+<div class="body">
+<ul>
+<li>抽样的三大原因：Time 时间 / Cost 成本 / Accuracy 准确性</li>
+<li>非概率抽样：按概率论之外选样本，选中概率 (a) 零 (b) 未知 (c) 不等</li>
+<li>概率抽样：依概率论 + 随机机制，选中概率 (a) 非零 (b) 已知 (c) 相等</li>
+<li>非概率四类型：Convenience 便利 / Purposive 判断 / Snowball 滚雪球 / Quota 配额</li>
+<li>非概率两大缺点：无法推广（generalize）+ 结果可能有偏（biased）</li>
+<li>关键术语：Element 元素 / Population 总体 / Study population 研究总体 / Sampling frame 抽样框 / Sampling unit 抽样单位</li>
+<li>Parameters 参数（总体真值）vs Sample statistics 统计量（样本估计）</li>
+<li>Representativeness 代表性：样本特征分布与总体一致；概率抽样增强、可推广、可推断</li>
+<li>三种分布：Sample（1 个样本）/ Sampling（多个样本）/ Population（总体）</li>
+<li>概率抽样四逻辑：减偏差 + 保代表 + 随机选 + 误差可算</li>
+<li>样本量越大，估计越接近真实值（10 人 $4.50 例子）</li>
+<li>MOE = Z × √(p×q/n)；p=q=0.5, n=1000, Z=1.96 → MOE ≈ 3%</li>
+<li>样本量 N = [Z²×p×q]/(MOE)²：95% 时 MOE 3% → 1067；5% → 384</li>
+<li>影响 MOE：样本量 + 概率抽样设计；不影响：总体规模（反直觉）</li>
+<li>概率抽样类型：Simple random 简单随机 / Systematic 系统（防 periodicity）/ Stratified 分层 / Cluster 整群 / Multistage 多阶段 / PPS 按规模成比例</li>
+<li>不等比例抽样：少数群体 oversample 多抽 + 分析时 weighting 加权</li>
+</ul>
+</div>
 </details>
 
 <div class="week-empty empty">本周没有匹配内容。</div>
@@ -1001,6 +1423,22 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 </div>
 <div id="note-list"></div>
 <div id="note-empty" class="empty" style="display:block">还没有笔记，写下第一条吧。</div>
+</section>
+
+<section id="calendar" class="week-page" style="display:none">
+<div class="week-head">
+<div><h2>📅 日程安排 <span class="wk-count"></span></h2><p class="sub">按 Syllabus 预标注的关键日期 + 你自行添加的重要节点，跨设备同步</p></div>
+</div>
+<div class="cal">
+<div class="cal-head"><b id="cal-month"></b>
+<button id="cal-prev" type="button" title="上一月">‹ 上一月</button>
+<button id="cal-today" type="button" title="回到本月">回到今天</button>
+<button id="cal-next" type="button" title="下一月">下一月 ›</button>
+</div>
+<div class="cal-grid" id="cal-grid"></div>
+<div class="cal-day" id="cal-day"></div>
+<div class="cal-note">点击日期查看 / 添加当天事件；颜色分级：<span class="cal-dot c-red" style="display:inline-block"></span>重要 <span class="cal-dot c-orange" style="display:inline-block"></span>提醒 <span class="cal-dot c-blue" style="display:inline-block"></span>一般 <span class="cal-dot c-green" style="display:inline-block"></span>阅读 <span class="cal-dot c-purple" style="display:inline-block"></span>考试</div>
+</div>
 </section>
 
 </main>
@@ -1087,6 +1525,40 @@ header{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.92);backdrop-f
 <div class="vrow"><div>Subjective Bias</div><div>主观偏差</div></div>
 <div class="vrow"><div>Natural Setting</div><div>自然环境</div></div>
 <div class="vrow"><div>Self-report</div><div>自我报告</div></div>
+<!-- Week 3 -->
+<div class="vrow"><div>Sampling</div><div>抽样</div></div>
+<div class="vrow"><div>Nonprobability Sampling</div><div>非概率抽样</div></div>
+<div class="vrow"><div>Probability Sampling</div><div>概率抽样</div></div>
+<div class="vrow"><div>Convenience Sampling</div><div>便利抽样</div></div>
+<div class="vrow"><div>Purposive / Judgmental Sampling</div><div>判断抽样</div></div>
+<div class="vrow"><div>Snowball Sampling</div><div>滚雪球抽样</div></div>
+<div class="vrow"><div>Quota Sampling</div><div>配额抽样</div></div>
+<div class="vrow"><div>Study Population</div><div>研究总体</div></div>
+<div class="vrow"><div>Sampling Frame</div><div>抽样框</div></div>
+<div class="vrow"><div>Sampling Unit</div><div>抽样单位</div></div>
+<div class="vrow"><div>Element</div><div>元素</div></div>
+<div class="vrow"><div>Parameters</div><div>参数</div></div>
+<div class="vrow"><div>Sample Statistics</div><div>样本统计量</div></div>
+<div class="vrow"><div>Representativeness</div><div>代表性</div></div>
+<div class="vrow"><div>Sample Distribution</div><div>样本分布</div></div>
+<div class="vrow"><div>Sampling Distribution</div><div>抽样分布</div></div>
+<div class="vrow"><div>Population Distribution</div><div>总体分布</div></div>
+<div class="vrow"><div>Sampling Error</div><div>抽样误差</div></div>
+<div class="vrow"><div>Margin of Error</div><div>误差边际</div></div>
+<div class="vrow"><div>Confidence Level</div><div>置信水平</div></div>
+<div class="vrow"><div>Confidence Interval</div><div>置信区间</div></div>
+<div class="vrow"><div>Simple Random Sampling</div><div>简单随机抽样</div></div>
+<div class="vrow"><div>Systematic Sampling</div><div>系统抽样</div></div>
+<div class="vrow"><div>Periodicity</div><div>周期性</div></div>
+<div class="vrow"><div>Sampling Interval</div><div>抽样间隔</div></div>
+<div class="vrow"><div>Stratified Sampling</div><div>分层抽样</div></div>
+<div class="vrow"><div>Strata</div><div>层（分层）</div></div>
+<div class="vrow"><div>Cluster Sampling</div><div>整群抽样</div></div>
+<div class="vrow"><div>Multistage Cluster Sampling</div><div>多阶段整群抽样</div></div>
+<div class="vrow"><div>PPS (Probability Proportionate to Size)</div><div>概率与规模成比例抽样</div></div>
+<div class="vrow"><div>Disproportionate Sampling</div><div>不等比例抽样</div></div>
+<div class="vrow"><div>Weighting</div><div>加权</div></div>
+<div class="vrow"><div>Oversample</div><div>过度抽样</div></div>
 </div>
 </aside>
 </div>
@@ -1105,12 +1577,51 @@ function haystack(t){
   return ((t.dataset.k||'')+' '+(sum?sum.innerText:'')+' '+(body?body.innerText:'')).toLowerCase();
 }
 
+/* 关键词高亮工具：把匹配词用 mark.hl 包起来（绿底白字），清空时还原 */
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function clearHl(root){
+  (root||document).querySelectorAll('mark.hl').forEach(m=>{
+    const p=m.parentNode;
+    p.replaceChild(document.createTextNode(m.textContent),m);
+    p.normalize();
+  });
+}
+function highlightIn(el,kw){
+  if(!kw||!el)return;
+  const rx=new RegExp(escRe(kw),'gi');
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,{
+    acceptNode(n){
+      const p=n.parentNode;
+      if(p&&p.closest&&p.closest('mark.hl,script,style,textarea,input,button,select,.rev-ops,.mk,.extra-del,.ed-btn'))return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes=[];let n;
+  while((n=walker.nextNode()))nodes.push(n);
+  nodes.forEach(tn=>{
+    const txt=tn.nodeValue;if(!txt)return;
+    rx.lastIndex=0;
+    if(!rx.test(txt))return;
+    rx.lastIndex=0;
+    const frag=document.createDocumentFragment();let last=0,m;
+    while((m=rx.exec(txt))){
+      if(m.index>last)frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
+      const mk=document.createElement('mark');mk.className='hl';mk.textContent=m[0];
+      frag.appendChild(mk);last=m.index+m[0].length;
+    }
+    if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));
+    tn.parentNode.replaceChild(frag,tn);
+  });
+}
+
 function showWeek(id,reset){
   pages.forEach(p=>p.style.display=(p.id===id)?'block':'none');
   links.forEach(a=>a.classList.toggle('active',a.dataset.page===id));
   current=id;
   if(reset){
     gq.value='';gres.style.display='none';gempty.style.display='none';
+    clearHl(document.body);
+    document.querySelectorAll('.ls').forEach(i=>i.value='');
     topics.forEach(t=>t.style.display='');
   }
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1118,31 +1629,52 @@ function showWeek(id,reset){
 
 links.forEach(a=>a.onclick=e=>{e.preventDefault();showWeek(a.dataset.page,true);});
 
-/* 全局搜索：搜所有内容 */
+/* 全局搜索：精准匹配知识点 + 关键词高亮 + 点击直达 */
 gq.oninput=()=>{
   const s=gq.value.trim().toLowerCase();
-  if(!s){gres.style.display='none';gempty.style.display='none';topics.forEach(t=>t.style.display='');return;}
-  const counts={};
+  clearHl(document.body);
+  if(!s){gres.style.display='none';gempty.style.display='none';topics.forEach(t=>{t.style.display='';t.open=false;});gq._hits=[];return;}
+  const hits=[];
   topics.forEach(t=>{
     const hit=haystack(t).includes(s);
     t.style.display=hit?'block':'none';
-    if(hit){t.open=true;const w=t.dataset.wk||'week1';counts[w]=(counts[w]||0)+1;}
+    if(hit){t.open=true;highlightIn(t,s);hits.push(t);}
   });
+  const counts={};
+  hits.forEach(t=>{const w=t.dataset.wk||'week1';counts[w]=(counts[w]||0)+1;});
   const ids=Object.keys(counts);
-  if(!ids.length){gempty.style.display='block';gres.style.display='none';return;}
+  if(!ids.length){gempty.style.display='block';gres.style.display='none';gq._hits=[];return;}
   gempty.style.display='none';
   if(!counts[current])showWeek(ids[0],false);
-  const items=ids.map(id=>{
-    const el=document.querySelector('.page-link[data-page="'+id+'"]');
-    const label=el?el.textContent.trim():id;
-    return '<div class="gr-item" data-w="'+id+'">'+label+' <span style="color:#16a34a;font-weight:700">（'+counts[id]+' 条）</span></div>';
+  const items=hits.slice(0,20).map(t=>{
+    const w=t.dataset.wk||'week1';
+    const el=document.querySelector('.page-link[data-page="'+w+'"]');
+    const wl=el?el.textContent.trim().split('·')[0].trim():w;
+    const st=t.querySelector('.sum-txt');
+    const title=(st?st.textContent:'').trim();
+    return '<div class="gr-item" data-i="'+hits.indexOf(t)+'" data-w="'+w+'" title="点击直达：'+title+'">'
+      +'<b style="color:#16a34a">'+wl+'</b> · '+title+'</div>';
   }).join('');
-  gres.innerHTML='<div class="gr-total">共 '+ids.reduce((a,b)=>a+counts[b],0)+' 条匹配，点击跳转：</div>'+items;
+  gres.innerHTML='<div class="gr-total">共 '+hits.length+' 条精准匹配，点击直达知识点：</div>'+items
+    +(hits.length>20?'<div class="gr-total">…还有 '+hits.length+' 条未显示，请继续输入更精确的关键词</div>':'');
   gres.style.display='block';
+  gq._hits=hits;
 };
 gres.onclick=e=>{
   const it=e.target.closest('.gr-item');
-  if(it){showWeek(it.dataset.w,false);gres.style.display='none';}
+  if(!it)return;
+  const w=it.dataset.w,idx=+it.dataset.i||0;
+  const hits=gq._hits||[];
+  const target=hits[idx];
+  showWeek(w,false);
+  if(target){
+    clearHl(document.body);
+    target.open=true;
+    highlightIn(target,gq.value.trim());
+    setTimeout(()=>{target.scrollIntoView({behavior:'smooth',block:'start'});},60);
+  }
+  gres.style.display='none';
+  gq._hits=[];
 };
 document.addEventListener('click',e=>{if(!e.target.closest('.search'))gres.style.display='none';});
 
@@ -1154,11 +1686,11 @@ pages.forEach(pg=>{
     input.oninput=()=>{
       const s=input.value.trim().toLowerCase();
       let n=0;
+      pg.querySelectorAll('.topic').forEach(t=>clearHl(t));
       pg.querySelectorAll('.topic').forEach(t=>{
         const hit=!s||haystack(t).includes(s);
         t.style.display=hit?'block':'none';
-        if(hit)n++;
-        if(s&&hit)t.open=true;
+        if(hit){n++;if(s){t.open=true;highlightIn(t,s);}}
       });
       if(box)box.style.display=(s&&!n)?'block':'none';
     };
@@ -1324,6 +1856,155 @@ function saveReview(){try{localStorage.setItem(REVIEW_KEY,JSON.stringify(reviewL
 function getTopic(tid){return document.querySelector('.topic[data-tid="'+tid+'"]');}
 function getWeekName(wid){const l=document.querySelector('.page-link[data-page="'+wid+'"]');return l?l.textContent.trim():wid;}
 
+/* ===== 富文本编辑（知识点 / 自建知识点 / 笔记）：加粗、高亮、下划线、改颜色，保存后云端同步 ===== */
+const EDITS_KEY='com5104_edits';
+let edits={};
+try{edits=JSON.parse(localStorage.getItem(EDITS_KEY)||'{}');}catch(err){edits={};}
+function saveEdits(){try{localStorage.setItem(EDITS_KEY,JSON.stringify(edits));}catch(err){}schedulePush();}
+function buildToolbar(handlers){
+  const tb=document.createElement('div');
+  tb.className='ed-toolbar';
+  tb.innerHTML='<button type="button" data-c="B" title="加粗"><b>B</b></button>'
+    +'<button type="button" data-c="U" title="下划线"><u>U</u></button>'
+    +'<span class="ed-pop" data-pop="hl" title="高亮颜色">高亮 ▾<span class="ed-options swatches">'
+    +'<button type="button" data-hl="#fde68a" title="黄色高亮" style="background:#fde68a"></button>'
+    +'<button type="button" data-hl="#bbf7d0" title="绿色高亮" style="background:#bbf7d0"></button>'
+    +'<button type="button" data-hl="#fecaca" title="粉色高亮" style="background:#fecaca"></button>'
+    +'</span></span>'
+    +'<span class="ed-pop" data-pop="fc" title="字体颜色">A ▾<span class="ed-options swatches">'
+    +'<button type="button" data-fc="#2563eb" title="蓝色" style="background:#2563eb"></button>'
+    +'<button type="button" data-fc="#facc15" title="黄色" style="background:#facc15"></button>'
+    +'</span></span>'
+    +'<button type="button" data-c="OL" title="有序列表（1. 2. 3.）">1. 2. 3.</button>'
+    +'<button type="button" data-c="UL" title="无序列表（小圆点）">• 列表</button>'
+    +'<span class="ed-pop" data-pop="box" title="插入彩色框">框 ▾<span class="ed-options">'
+    +'<button type="button" data-box="ub-gray"><span class="ed-swatch" style="background:#d1d5db"></span>灰框</button>'
+    +'<button type="button" data-box="ub-green"><span class="ed-swatch" style="background:#22c55e"></span>绿框</button>'
+    +'<button type="button" data-box="ub-blue"><span class="ed-swatch" style="background:#2563eb"></span>蓝框</button>'
+    +'<button type="button" data-box="ub-red"><span class="ed-swatch" style="background:#dc2626"></span>红框</button>'
+    +'<button type="button" data-box="ub-yellow"><span class="ed-swatch" style="background:#f59e0b"></span>黄框</button>'
+    +'</span></span>'
+    +'<span class="ed-sep"></span>'
+    +'<button type="button" class="ed-save">保存</button>'
+    +'<button type="button" class="ed-cancel">取消</button>'
+    +'<button type="button" class="ed-reset" title="恢复为默认内容">恢复默认</button>';
+  /* 关键：所有工具栏按钮/下拉 mousedown 都 preventDefault，避免编辑区失焦导致选区丢失（否则颜色/高亮会失效） */
+  tb.addEventListener('mousedown',e=>{if(e.target.closest('button')||e.target.closest('.ed-pop'))e.preventDefault();});
+  tb.querySelectorAll('button[data-c]').forEach(b=>{
+    b.onclick=()=>{
+      const c=b.dataset.c;
+      if(c==='B')document.execCommand('bold');
+      else if(c==='U')document.execCommand('underline');
+      else if(c==='OL')document.execCommand('insertOrderedList');
+      else if(c==='UL')document.execCommand('insertUnorderedList');
+      const act=handlers.getActive();if(act)act.focus();
+    };
+  });
+  const closePops=()=>tb.querySelectorAll('.ed-pop.open').forEach(p=>p.classList.remove('open'));
+  tb.querySelectorAll('.ed-pop').forEach(pop=>{
+    pop.onclick=e=>{e.stopPropagation();const was=pop.classList.contains('open');closePops();if(!was)pop.classList.add('open');};
+    pop.querySelectorAll('[data-hl]').forEach(b=>{
+      b.onclick=e=>{e.stopPropagation();document.execCommand('hiliteColor',false,b.dataset.hl);closePops();const act=handlers.getActive();if(act)act.focus();};
+    });
+    pop.querySelectorAll('[data-fc]').forEach(b=>{
+      b.onclick=e=>{e.stopPropagation();document.execCommand('foreColor',false,b.dataset.fc);closePops();const act=handlers.getActive();if(act)act.focus();};
+    });
+    pop.querySelectorAll('[data-box]').forEach(b=>{
+      b.onclick=e=>{e.stopPropagation();wrapSelectionBox(b.dataset.box);closePops();const act=handlers.getActive();if(act)act.focus();};
+    });
+  });
+  const closeAll=()=>closePops();
+  document.addEventListener('click',closeAll);
+  tb._closeAll=closeAll;
+  if(handlers.onSave)tb.querySelector('.ed-save').onclick=handlers.onSave;
+  if(handlers.onCancel)tb.querySelector('.ed-cancel').onclick=handlers.onCancel;
+  if(handlers.onReset)tb.querySelector('.ed-reset').onclick=handlers.onReset;
+  else tb.querySelector('.ed-reset').style.display='none';
+  return tb;
+}
+function wrapSelectionBox(cls){
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0)return;
+  const range=sel.getRangeAt(0);
+  const box=document.createElement('div');
+  box.className=cls;
+  box.dataset.ub='1';
+  if(range.collapsed){
+    box.innerHTML='<br>';
+    range.insertNode(box);
+    sel.removeAllRanges();
+    const r=document.createRange();r.setStart(box,0);r.collapse(true);sel.addRange(r);
+    return;
+  }
+  try{
+    const frag=range.extractContents();
+    box.appendChild(frag);
+    range.insertNode(box);
+  }catch(err){}
+  sel.removeAllRanges();
+}
+function enterEdit(t){
+  const body=t.querySelector('.body');
+  if(!body||body.classList.contains('editing'))return;
+  t.open=true;
+  clearHl(body);
+  body.dataset.backup=body.innerHTML;
+  t.classList.add('editing');
+  body.classList.add('editing');
+  const tb=buildToolbar({
+    getActive:()=>body,
+    onSave:()=>exitEdit(t,true),
+    onCancel:()=>exitEdit(t,false),
+    onReset:()=>{
+      const tid=t.dataset.tid;
+      if(tid)delete edits[tid];
+      body.innerHTML=body.dataset.orig||body.dataset.backup;
+      saveEdits();
+      exitEdit(t,false);
+    }
+  });
+  t.insertBefore(tb,body);
+  body.contentEditable='true';
+  body.focus();
+}
+function exitEdit(t,save){
+  const body=t.querySelector('.body');
+  const tb=t.querySelector('.ed-toolbar');
+  if(!body)return;
+  if(save){
+    clearHl(body);
+    const tid=t.dataset.tid;
+    if(!body.dataset.orig)body.dataset.orig=body.innerHTML;
+    if(tid)edits[tid]=body.innerHTML;
+    saveEdits();
+  }else{
+    body.innerHTML=body.dataset.backup||body.innerHTML;
+    delete body.dataset.backup;
+  }
+  body.contentEditable='false';
+  body.classList.remove('editing');
+  t.classList.remove('editing');
+  if(tb){if(tb._closeAll)document.removeEventListener('click',tb._closeAll);tb.remove();}
+  const s=(gq.value||'').trim();
+  if(s)highlightIn(body,s);
+}
+function applyEditsAll(){
+  topics.forEach(t=>{
+    const body=t.querySelector('.body');
+    if(!body||body.classList.contains('editing'))return;
+    const tid=t.dataset.tid;
+    if(!body.dataset.orig)body.dataset.orig=body.innerHTML;
+    if(tid&&edits[tid]&&edits[tid]!==body.innerHTML)body.innerHTML=edits[tid];
+    const sum=t.querySelector('summary');
+    if(sum&&!sum.querySelector('.ed-btn')){
+      const b=document.createElement('button');
+      b.type='button';b.className='ed-btn';b.textContent='✎ 编辑';b.title='编辑本知识点：可加粗 / 高亮 / 下划线 / 改颜色，保存后云端同步';
+      b.onclick=e=>{e.stopPropagation();enterEdit(t);};
+      sum.appendChild(b);
+    }
+  });
+}
+
 /* 给所有知识点补折叠标记；给 Week 1-6 知识点注入 勾选框 + 加入按钮 */
 let extraSeq=0;
 function setupTopic(t,pg,tid){
@@ -1362,6 +2043,7 @@ document.querySelectorAll('.week-page').forEach(pg=>{
     setupTopic(t,pg,pg.id+'-'+i);
   });
 });
+applyEditsAll();
 
 /* ===== 其他知识点（上课手动补充，按周保存） ===== */
 const EXTRA_KEY='com5104_extra';
@@ -1407,6 +2089,7 @@ function renderExtras(){
     if(cnt)cnt.textContent=arr.length?('（'+arr.length+' 条）'):'';
   });
   topics=[...document.querySelectorAll('.topic')];
+  applyEditsAll();
 }
 function removeExtra(wid,idx){
   const tid=wid+'-x'+idx;
@@ -1414,6 +2097,7 @@ function removeExtra(wid,idx){
   extraData[wid].splice(idx,1);
   if(!extraData[wid].length)delete extraData[wid];
   saveExtra();
+  if(edits[tid]){delete edits[tid];saveEdits();}
   reviewList=reviewList.filter(x=>x!==tid);
   selected.delete(tid);
   updateBulk();
@@ -1495,7 +2179,7 @@ function syncReviewToggle(){
 function setSyncState(t){syncText=t;updateVmeta();}
 function schedulePush(){clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
 function pushToCloud(){
-  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes})})
+  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta})})
   .then(r=>r.ok?r.json():Promise.reject())
   .then(()=>setSyncState('☁ 已同步'))
   .catch(()=>setSyncState('⚠ 离线，改动暂存本机'));
@@ -1537,10 +2221,36 @@ async function loadFromCloud(){
           const id=String((n&&n.id)||'');
           if(!id||seenN.has(id))return false; seenN.add(id); return true;
         });
+        /* 编辑内容：合并云端 ∪ 本地（本地优先，保留本设备刚编辑的内容） */
+        const cloudEdits=(d.edits&&typeof d.edits==='object')?d.edits:{};
+        const mergedEdits={};
+        Object.keys(cloudEdits).forEach(k=>{mergedEdits[k]=cloudEdits[k];});
+        Object.keys(edits).forEach(k=>{mergedEdits[k]=edits[k];});
+        edits=mergedEdits;
+        /* 日历事件：合并云端 ∪ 本地（按 id 去重） */
+        const cloudCal=Array.isArray(d.calendar)?d.calendar:[];
+        const seenC=new Set();
+        calEvents=[...cloudCal,...calEvents].filter(e=>{
+          const id=String((e&&e.id)||'');
+          if(!id||seenC.has(id))return false; seenC.add(id); return true;
+        });
+        /* 图片元数据：合并云端 ∪ 本地（按 id 去重，云端图片稍后补拉） */
+        const cloudImgs=(d.images&&typeof d.images==='object')?d.images:{};
+        const myImgs=imgMeta;
+        imgMeta={};
+        new Set([...Object.keys(cloudImgs),...Object.keys(myImgs)]).forEach(wk=>{
+          const seenI=new Set();
+          imgMeta[wk]=[...(cloudImgs[wk]||[]),...(myImgs[wk]||[])].filter(x=>{
+            const id=String((x&&x.id)||'');
+            if(!id||seenI.has(id))return false; seenI.add(id); return true;
+          });
+          if(!imgMeta[wk].length)delete imgMeta[wk];
+        });
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
-        renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
+        renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
         pushToCloud();
       }else if(d.v>lastTs){
@@ -1549,17 +2259,21 @@ async function loadFromCloud(){
         extraData=(d.extra&&typeof d.extra==='object')?d.extra:{};
         extraVocab=Array.isArray(d.vocab)?d.vocab:[];
         notes=Array.isArray(d.notes)?d.notes:[];
+        edits=(d.edits&&typeof d.edits==='object')?d.edits:{};
+        calEvents=Array.isArray(d.calendar)?d.calendar:[];
+        imgMeta=(d.images&&typeof d.images==='object')?d.images:{};
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
-        renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
+        applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
+        renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
       }else{
         /* 本地较新或相同：以本地为准推回云端 —— 让「刚删除/刚添加」立即同步出去 */
         pushToCloud();
         setSyncState('☁ 已同步');
       }
-    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length){
+    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length||calEvents.length||Object.keys(imgMeta).length){
       pushToCloud();
     }else{
       setSyncState('☁ 已同步');
@@ -1571,6 +2285,9 @@ function saveLocalAll(){
   try{localStorage.setItem(EXTRA_KEY,JSON.stringify(extraData));}catch(e){}
   try{localStorage.setItem(VA_KEY,JSON.stringify(extraVocab));}catch(e){}
   try{localStorage.setItem(NOTE_KEY,JSON.stringify(notes));}catch(e){}
+  try{localStorage.setItem(EDITS_KEY,JSON.stringify(edits));}catch(e){}
+  try{localStorage.setItem(CAL_KEY,JSON.stringify(calEvents));}catch(e){}
+  try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(e){}
 }
 /* ===== 课堂笔记（本地 + 云端同步） ===== */
 const NOTE_KEY='com5104_notes';
@@ -1580,17 +2297,44 @@ const noteInput=document.getElementById('note-input'),noteBtn=document.getElemen
 const noteListEl=document.getElementById('note-list'),noteEmpty=document.getElementById('note-empty');
 const noteCount=document.querySelector('#notes .note-count');
 function saveNotes(){try{localStorage.setItem(NOTE_KEY,JSON.stringify(notes));}catch(err){}schedulePush();}
+function enterNoteEdit(d,b,n){
+  if(b.isContentEditable)return;
+  clearHl(b);
+  const backup=b.innerHTML;
+  d.classList.add('editing');
+  b.contentEditable='true';b.classList.add('ed-body');
+  const tb=buildToolbar({
+    getActive:()=>b,
+    onSave:()=>{
+      clearHl(b);
+      n.html=b.innerHTML;
+      n.text=b.textContent.replace(/\s+/g,' ').trim();
+      saveNotes();renderNotes();
+    },
+    onCancel:()=>{
+      b.innerHTML=backup;
+      b.contentEditable='false';b.classList.remove('ed-body');d.classList.remove('editing');
+      if(tb._closeAll)document.removeEventListener('click',tb._closeAll);
+      tb.remove();
+    }
+  });
+  d.insertBefore(tb,b.nextSibling);
+  b.focus();
+}
 function renderNotes(){
   if(!noteListEl)return;
   noteListEl.innerHTML='';
   notes.slice().reverse().forEach(n=>{
     const d=document.createElement('div');
     d.className='note-item';
-    const b=document.createElement('div');b.className='note-body';b.textContent=n.text;
+    const b=document.createElement('div');b.className='note-body';
+    b.innerHTML=n.html||escapeHtml(n.text||'');
     const t=document.createElement('time');t.className='note-time';t.textContent=n.time;
+    const ed=document.createElement('button');ed.className='note-edit';ed.type='button';ed.textContent='✎ 编辑';ed.title='编辑这条笔记：可加粗 / 高亮 / 下划线 / 改颜色';
+    ed.onclick=()=>enterNoteEdit(d,b,n);
     const del=document.createElement('button');del.className='note-del';del.type='button';del.textContent='✕';del.title='删除这条笔记';
     del.onclick=()=>{notes=notes.filter(x=>x.id!==n.id);saveNotes();renderNotes();};
-    d.appendChild(b);d.appendChild(t);d.appendChild(del);
+    d.appendChild(b);d.appendChild(t);d.appendChild(ed);d.appendChild(del);
     noteListEl.appendChild(d);
   });
   if(noteEmpty)noteEmpty.style.display=notes.length?'none':'block';
@@ -1599,13 +2343,232 @@ function renderNotes(){
 function addNote(){
   const text=noteInput.value.trim();
   if(!text){noteInput.focus();return;}
-  notes.push({id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:text,time:new Date().toLocaleString('zh-CN',{hour12:false})});
+  const html=escapeHtml(text).replace(/\n/g,'<br>');
+  notes.push({id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:text,html:html,time:new Date().toLocaleString('zh-CN',{hour12:false})});
   noteInput.value='';
   saveNotes();renderNotes();
 }
 if(noteBtn)noteBtn.onclick=addNote;
 if(noteInput)noteInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();addNote();}});
 renderNotes();
+
+/* ===== 左侧课程日历（syllabus 预标注 + 自定义 + 颜色分级 + 删除，云端同步） ===== */
+const CAL_KEY='com5104_calendar';
+let calEvents=[];
+try{calEvents=JSON.parse(localStorage.getItem(CAL_KEY)||'[]');}catch(err){calEvents=[];}
+const CAL_DEFAULTS=[
+ {id:'cal-20260909',date:'2026-09-09',title:'小组名单提交（Week 2）',color:'orange'},
+ {id:'cal-20260923',date:'2026-09-23',title:'Quiz 1（覆盖 Week 1-3）',color:'red'},
+ {id:'cal-20260930',date:'2026-09-30',title:'Assignment 1（5%）',color:'red'},
+ {id:'cal-20261028',date:'2026-10-28',title:'Assignment 2（10%）· 阅读周',color:'orange'},
+ {id:'cal-20261111',date:'2026-11-11',title:'Quiz 2（覆盖 Week 4-10）',color:'red'},
+ {id:'cal-20261125',date:'2026-11-25',title:'小组报告提交 + 展示',color:'purple'},
+ {id:'cal-20261130',date:'2026-11-30',title:'Final Quiz（14:00）',color:'purple'}
+];
+if(!calEvents.length){calEvents=CAL_DEFAULTS.map(x=>Object.assign({},x));try{localStorage.setItem(CAL_KEY,JSON.stringify(calEvents));}catch(err){}}
+function saveCal(){try{localStorage.setItem(CAL_KEY,JSON.stringify(calEvents));}catch(err){}schedulePush();}
+let calSel=null,calY=0,calM=0;
+function pad2(n){return String(n).padStart(2,'0');}
+function fmtDateD(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function calEventsOf(date){return calEvents.filter(e=>e.date===date);}
+function calRender(){
+  const monthEl=document.getElementById('cal-month');
+  const grid=document.getElementById('cal-grid');
+  const dayEl=document.getElementById('cal-day');
+  if(!monthEl||!grid)return;
+  monthEl.textContent=calY+' 年 '+(calM+1)+' 月';
+  grid.innerHTML='';
+  ['一','二','三','四','五','六','日'].forEach(w=>{const d=document.createElement('div');d.className='cal-wd';d.textContent=w;grid.appendChild(d);});
+  const first=new Date(calY,calM,1);
+  const startPad=(first.getDay()+6)%7;
+  const daysIn=new Date(calY,calM+1,0).getDate();
+  const todayStr=fmtDateD(new Date());
+  for(let i=0;i<startPad;i++){const d=document.createElement('div');d.className='cal-cell other';d.textContent='';grid.appendChild(d);}
+  for(let day=1;day<=daysIn;day++){
+    const ds=calY+'-'+pad2(calM+1)+'-'+pad2(day);
+    const c=document.createElement('div');
+    c.className='cal-cell'+(ds===todayStr?' today':'')+(ds===calSel?' sel':'');
+    c.textContent=day;
+    const evs=calEventsOf(ds);
+    if(evs.length){
+      const dots=document.createElement('div');dots.className='cal-dots';
+      evs.slice(0,4).forEach(e=>{const dot=document.createElement('span');dot.className='cal-dot c-'+e.color;dots.appendChild(dot);});
+      c.appendChild(dots);
+    }
+    c.onclick=()=>{calSel=ds;calRender();};
+    grid.appendChild(c);
+  }
+  calRenderDay(dayEl);
+}
+function calRenderDay(dayEl){
+  if(!dayEl)return;
+  if(!calSel){dayEl.innerHTML='<div class="cal-empty">点击任意日期，查看 / 添加当天的事件</div>';return;}
+  const evs=calEventsOf(calSel);
+  const fmt=calSel.slice(5).replace('-','/');
+  let h='<h6>'+fmt+' 的事件</h6>';
+  if(!evs.length)h+='<div class="cal-empty">这一天还没有事件。</div>';
+  evs.forEach(e=>{
+    h+='<div class="cal-ev"><span class="cal-c c-'+e.color+'"></span><b>'+escapeHtml(e.title)+'</b>'
+      +'<button class="cal-del" type="button" data-id="'+e.id+'" title="删除">✕</button></div>';
+  });
+  h+='<div class="cal-add">'
+    +'<input id="cal-in" placeholder="事件，如：老师提到某节点" autocomplete="off">'
+    +'<select id="cal-color">'
+    +'<option value="red">🔴 重要</option><option value="orange">🟠 提醒</option><option value="blue">🔵 一般</option><option value="green">🟢 阅读</option><option value="purple">🟣 考试</option>'
+    +'</select><button id="cal-add-btn" type="button">＋ 添加</button></div>';
+  dayEl.innerHTML=h;
+  dayEl.querySelectorAll('.cal-del').forEach(b=>{
+    b.onclick=()=>{
+      calEvents=calEvents.filter(x=>x.id!==b.dataset.id);saveCal();calRender();
+    };
+  });
+  const inp=dayEl.querySelector('#cal-in'),btn=dayEl.querySelector('#cal-add-btn'),selc=dayEl.querySelector('#cal-color');
+  const doAdd=()=>{
+    const t=inp.value.trim();if(!t){inp.focus();return;}
+    calEvents.push({id:'c'+Date.now()+Math.random().toString(36).slice(2,5),date:calSel,title:t,color:selc.value});
+    saveCal();calRender();
+  };
+  btn.onclick=doAdd;
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doAdd();}});
+}
+(function(){
+  const prev=document.getElementById('cal-prev'),next=document.getElementById('cal-next'),today=document.getElementById('cal-today');
+  if(!prev)return;
+  prev.onclick=()=>{calM--;if(calM<0){calM=11;calY--;}calRender();};
+  next.onclick=()=>{calM++;if(calM>11){calM=0;calY++;}calRender();};
+  today.onclick=()=>{const n=new Date();calY=n.getFullYear();calM=n.getMonth();calSel=fmtDateD(n);calRender();};
+  const n=new Date();calY=n.getFullYear();calM=n.getMonth();
+  const ts=fmtDateD(n);
+  if(calEvents.some(e=>e.date===ts))calSel=ts;
+  calRender();
+})();
+
+/* ===== 其他知识点 · 课堂图片（压缩 + IndexedDB 本地缓存 + 云端同步） ===== */
+const IMGS_KEY='com5104_images';
+let imgMeta={};
+try{imgMeta=JSON.parse(localStorage.getItem(IMGS_KEY)||'{}');}catch(err){imgMeta={};}
+function saveImgMeta(){try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(err){}schedulePush();}
+const IDB_NAME='com5104_imgdb',IDB_STORE='imgs';
+let _idb=null;
+function idbOpen(){return new Promise((res,rej)=>{
+  if(_idb)return res(_idb);
+  if(!window.indexedDB)return rej(new Error('no idb'));
+  const rq=indexedDB.open(IDB_NAME,1);
+  rq.onupgradeneeded=()=>{if(!rq.result.objectStoreNames.contains(IDB_STORE))rq.result.createObjectStore(IDB_STORE);};
+  rq.onsuccess=()=>{_idb=rq.result;res(_idb);};
+  rq.onerror=()=>rej(rq.error);
+});}
+function idbPut(id,dataUrl){return idbOpen().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).put(dataUrl,id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+function idbGet(id){return idbOpen().then(db=>new Promise((res,rej)=>{const rq=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(id);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);}));}
+function idbDel(id){return idbOpen().then(db=>new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).delete(id);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);}));}
+function idbAllKeys(){return idbOpen().then(db=>new Promise((res,rej)=>{const rq=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).getAllKeys();rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej(rq.error);}));}
+function compressImage(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=1920;
+      let w=img.width,h=img.height;
+      if(w>MAX||h>MAX){if(w>=h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg',0.82));
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('img'));};
+    img.src=url;
+  });
+}
+function pushImgCloud(id,dataUrl){
+  const body=dataUrl.split(',')[1];
+  return fetch('/api/image/'+id,{method:'PUT',headers:{'Content-Type':'image/jpeg'},body})
+    .then(r=>r.ok?r.json():Promise.reject())
+    .catch(()=>{setSyncState('⚠ 部分图片离线未上传');});
+}
+async function handleImgFiles(week,files){
+  const list=imgMeta[week]||[];
+  for(const f of [...files]){
+    if(!f.type||!f.type.startsWith('image/'))continue;
+    try{
+      const dataUrl=await compressImage(f);
+      const id='i'+Date.now()+Math.random().toString(36).slice(2,8);
+      await idbPut(id,dataUrl);
+      list.push({id:id,name:f.name,time:new Date().toLocaleString('zh-CN',{hour12:false})});
+      pushImgCloud(id,dataUrl);
+    }catch(err){}
+  }
+  imgMeta[week]=list;
+  saveImgMeta();
+  renderImgs(week);
+}
+function renderImgs(week){
+  const grid=document.getElementById('img-grid-'+week);
+  const cnt=document.getElementById('img-count-'+week);
+  const st=document.getElementById('img-status-'+week);
+  if(!grid)return;
+  const list=imgMeta[week]||[];
+  grid.innerHTML='';
+  if(cnt)cnt.textContent=list.length?('（'+list.length+' 张）'):'';
+  list.forEach(item=>{
+    const card=document.createElement('div');card.className='img-card';
+    const im=document.createElement('img');im.alt=item.name||'图片';im.loading='lazy';
+    card.appendChild(im);
+    const del=document.createElement('button');del.className='img-del';del.type='button';del.textContent='✕';del.title='删除这张图片（所有设备同步删除）';
+    del.onclick=()=>{
+      imgMeta[week]=(imgMeta[week]||[]).filter(x=>x.id!==item.id);
+      if(!imgMeta[week].length)delete imgMeta[week];
+      saveImgMeta();
+      idbDel(item.id);
+      fetch('/api/image/'+item.id,{method:'DELETE'}).catch(()=>{});
+      renderImgs(week);
+    };
+    card.appendChild(del);
+    grid.appendChild(card);
+    idbGet(item.id).then(dataUrl=>{if(dataUrl)im.src=dataUrl;}).catch(()=>{});
+  });
+  if(st)st.textContent=list.length?('点击图片可放大 · 自动压缩后云端同步'):'';
+}
+function bindImgZone(week){
+  const drop=document.getElementById('img-drop-'+week);
+  const file=document.getElementById('img-file-'+week);
+  if(!drop)return;
+  drop.onclick=()=>file.click();
+  file.onchange=()=>{if(file.files.length)handleImgFiles(week,file.files);file.value='';};
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+  drop.addEventListener('drop',e=>{if(e.dataTransfer&&e.dataTransfer.files.length)handleImgFiles(week,e.dataTransfer.files);});
+}
+['week1','week2','week3','week4','week5','week6'].forEach(w=>{bindImgZone(w);renderImgs(w);});
+function renderImgsAll(){['week1','week2','week3','week4','week5','week6'].forEach(w=>renderImgs(w));}
+function syncImgCache(){
+  const ids=new Set();
+  Object.keys(imgMeta).forEach(wk=>(imgMeta[wk]||[]).forEach(x=>{if(x&&x.id)ids.add(x.id);}));
+  /* 清理本地 IndexedDB 中已被云端删除的图片 */
+  idbAllKeys().then(keys=>{(keys||[]).forEach(k=>{if(!ids.has(k))idbDel(k);});}).catch(()=>{});
+  /* 拉取本设备缺失的图片 */
+  ids.forEach(id=>{
+    idbGet(id).then(dataUrl=>{
+      if(dataUrl)return;
+      fetch('/api/image/'+id)
+        .then(r=>{if(!r.ok)throw new Error('nf');return r.arrayBuffer();})
+        .then(buf=>{
+          const bytes=new Uint8Array(buf),chunks=[],CH=0x8000;
+          for(let i=0;i<bytes.length;i+=CH)chunks.push(String.fromCharCode.apply(null,bytes.subarray(i,i+CH)));
+          return idbPut(id,'data:image/jpeg;base64,'+btoa(chunks.join('')));
+        })
+        .then(()=>renderImgsAll())
+        .catch(()=>{});
+    }).catch(()=>{});
+  });
+}
+/* 图片点击放大（lightbox） */
+const lb=document.createElement('div');lb.className='img-lb';document.body.appendChild(lb);
+lb.onclick=()=>lb.classList.remove('open');
+document.addEventListener('click',e=>{
+  const im=e.target.closest('.img-card img');
+  if(im){lb.innerHTML='<img src="'+im.src+'">';lb.classList.add('open');}
+});
+
 loadFromCloud();
 </script>
 </body>
