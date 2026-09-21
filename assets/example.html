@@ -2162,6 +2162,19 @@ function enterEdit(t){
   const ebTop=t.querySelector('.body>.ed-btn');
   if(ebTop)ebTop.style.display='none';
   body.contentEditable='true';
+  /* 在彩框（.ub-xxx）内按 Enter 只插换行 <br>，不要让浏览器把框拆成两个 */
+  body.addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey){
+      const sel=window.getSelection();
+      if(!sel||sel.rangeCount===0)return;
+      let node=sel.getRangeAt(0).startContainer;
+      if(node&&node.nodeType===3)node=node.parentNode;
+      if(node&&node.closest&&node.closest('.ub-gray,.ub-green,.ub-blue,.ub-red,.ub-yellow')){
+        e.preventDefault();
+        document.execCommand('insertLineBreak');
+      }
+    }
+  });
   body.focus();
   try{const r=document.createRange();r.selectNodeContents(body);r.collapse(false);const s=window.getSelection();s.removeAllRanges();s.addRange(r);}catch(_){}
 }
