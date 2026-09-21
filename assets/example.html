@@ -48,10 +48,11 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .side-group .page-link{border-radius:0;margin:0;padding-left:26px;border-top:1px solid #f3f4f6}
 .main-top{display:flex;justify-content:flex-end;margin-bottom:10px}
 /* ===== 使用说明 icon（悬停弹出） ===== */
-.help{position:relative;flex:none;cursor:help}
-.help-ic{display:flex;width:28px;height:28px;border:2px solid #22c55e;color:#16a34a;border-radius:50%;align-items:center;justify-content:center;font-weight:800;font-size:14px;background:#fff;transition:background .15s}
+.help{position:fixed;right:22px;bottom:22px;z-index:60;cursor:help;opacity:.65;transition:opacity .15s}
+.help-ic{display:flex;width:22px;height:22px;border:2px solid #22c55e;color:#16a34a;border-radius:50%;align-items:center;justify-content:center;font-weight:800;font-size:11px;background:#fff;transition:background .15s}
+.help:hover,.help.open{opacity:1}
 .help:hover .help-ic,.help.open .help-ic{background:#f0fdf4}
-.help-tip{position:absolute;top:calc(100% + 10px);right:0;width:360px;max-width:calc(100vw - 40px);background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:14px 16px;font-size:13px;line-height:1.85;color:#374151;display:none;z-index:40;text-align:left}
+.help-tip{position:absolute;bottom:calc(100% + 12px);right:0;left:auto;width:360px;max-width:calc(100vw - 40px);background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.18);padding:14px 16px;font-size:13px;line-height:1.85;color:#374151;display:none;z-index:40;text-align:left}
 .help:hover .help-tip,.help.open .help-tip{display:block}
 .help-tip b{color:#065f46}
 .help-tip .term{color:#16a34a;font-weight:700}
@@ -73,7 +74,7 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 /* ===== 知识点卡片 ===== */
 .topic{margin-bottom:12px;overflow:hidden;transition:box-shadow .15s}
 .topic:hover{box-shadow:0 2px 8px rgba(15,23,42,.06)}
-.topic summary{cursor:pointer;padding:15px 17px;font-weight:750;list-style:none;display:flex;align-items:center;gap:10px;color:#111827}
+.topic summary{cursor:pointer;user-select:none;padding:15px 17px;font-weight:750;list-style:none;display:flex;align-items:center;gap:10px;color:#111827}
 .topic summary::-webkit-details-marker{display:none}
 .topic summary .sum-txt{flex:1}
 .mk{flex:none;color:#9ca3af;font-weight:400}
@@ -98,11 +99,8 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .rev-in{color:#16a34a;font-size:12px;font-weight:700;white-space:nowrap}
 /* ===== Syllabus 板块 ===== */
 .syl{background:#fff;border:1px solid #e5e7eb;border-radius:16px;margin-bottom:16px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 20px rgba(15,23,42,.08)}
-.syl>summary{cursor:pointer;padding:14px 17px;font-weight:800;color:#111827;list-style:none;font-size:15.5px}
-.syl>summary::-webkit-details-marker{display:none}
-.syl>summary:after{content:"＋";float:right;color:#9ca3af}
-.syl[open]>summary:after{content:"－"}
 .syl-body{padding:0 17px 17px;border-top:1px solid #f1f5f9}
+.syl-body.editing{outline:2px dashed #22c55e;outline-offset:4px;border-radius:8px}
 .syl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .syl-sec{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:10px 13px}
 .syl-sec b{color:#16a34a;font-size:13.5px}
@@ -450,9 +448,9 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 <div class="week-head">
 <div><h2>📋 Syllabus</h2><p class="sub">课程关键信息：评分结构 · 提交时间线 · 小组须知 · 课堂工具</p></div>
 </div>
-<details class="panel syl" open>
-<summary>课程关键信息速览（必看）</summary>
-<div class="syl-body">
+<details class="panel syl topic" open data-tid="sylla-overview">
+<summary><span class="sum-txt">课程关键信息速览（必看）</span><span class="mk"></span></summary>
+<div class="syl-body body">
 <div class="syl-grid">
 <div class="syl-sec"><b>📌 评分结构（共 100%）</b>
 <ul>
@@ -2161,8 +2159,11 @@ function enterEdit(t){
     }
   });
   t.insertBefore(tb,body);
+  const ebTop=t.querySelector('.body>.ed-btn');
+  if(ebTop)ebTop.style.display='none';
   body.contentEditable='true';
   body.focus();
+  try{const r=document.createRange();r.selectNodeContents(body);r.collapse(false);const s=window.getSelection();s.removeAllRanges();s.addRange(r);}catch(_){}
 }
 function exitEdit(t,save){
   const body=t.querySelector('.body');
@@ -2181,6 +2182,8 @@ function exitEdit(t,save){
   body.contentEditable='false';
   body.classList.remove('editing');
   t.classList.remove('editing');
+  const ebTop=t.querySelector('.body>.ed-btn');
+  if(ebTop)ebTop.style.display='inline-block';
   if(tb){if(tb._closeAll)document.removeEventListener('click',tb._closeAll);tb.remove();}
   const s=(gq.value||'').trim();
   if(s)highlightIn(body,s);
@@ -2192,11 +2195,13 @@ function applyEditsAll(){
     const tid=t.dataset.tid;
     if(!body.dataset.orig)body.dataset.orig=body.innerHTML;
     if(tid&&edits[tid]&&edits[tid]!==body.innerHTML)body.innerHTML=edits[tid];
+    /* 清理旧版本残留在正文里的编辑按钮（按钮应在 summary，不在 body） */
+    body.querySelectorAll('.ed-btn').forEach(b=>b.remove());
     const sum=t.querySelector('summary');
-    if(sum&&!sum.querySelector('.ed-btn')){
+    if(sum&&!sum.querySelector('.ed-btn')&&!body.querySelector('.ed-btn')){
       const b=document.createElement('button');
       b.type='button';b.className='ed-btn';b.textContent='✎ 编辑';b.title='编辑本知识点：可加粗 / 高亮 / 下划线 / 改颜色，保存后云端同步';
-      b.onclick=e=>{e.stopPropagation();enterEdit(t);};
+      b.onclick=e=>{e.preventDefault();e.stopPropagation();enterEdit(t);};
       sum.appendChild(b);
       const dc=sum.querySelector('.done-chk');
       if(dc)sum.appendChild(dc);
@@ -2883,7 +2888,7 @@ function renderPlans(){
   if(!cheerInit){prevDoneRatio=ratio;cheerInit=true;}
   else if(total>0&&ratio===1&&prevDoneRatio<1)showCheer();
   prevDoneRatio=ratio;
-  if(!plans.length){planList.innerHTML='<div class="plan-empty">还没有任何计划，在上面添加第一条吧</div>';return;}
+  if(!plans.length){planList.innerHTML='<div class="plan-empty">还没有任何计划，在上面添加第一条吧</div>';}
   const byDate={};
   plans.forEach(p=>{(byDate[p.date]=byDate[p.date]||[]).push(p);});
   /* 分桶：A=过去日期仍有未完成(最前提醒) / B=今天 / C=未来日期 / D=过去已全部完成(归档收纳) */
@@ -2925,10 +2930,10 @@ function renderPlans(){
   /* D 桶：冠军圆圈图标永远在那，点击展开完成卡片 */
   const doneCntAll=bucketD.reduce((n,ds)=>n+byDate[ds].length,0);
   {
-    const wrap=document.createElement('div');wrap.style.cssText='margin-top:18px;text-align:center';
+    const wrap=document.createElement('div');wrap.style.cssText='margin-top:18px';
     const btn=document.createElement('button');
-    btn.style.cssText='width:46px;height:46px;border-radius:50%;border:2px solid #22c55e;background:#f0fdf4;font-size:22px;cursor:pointer;box-shadow:0 3px 10px rgba(34,197,94,.35)';
-    btn.textContent='🏆';btn.title='已完成归档（'+doneCntAll+' 项）';
+    btn.style.cssText='width:100%;padding:11px 14px;border:2px solid #22c55e;background:#f0fdf4;color:#16a34a;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(34,197,94,.18);text-align:center';
+    btn.textContent='✅ 已完成计划（'+doneCntAll+' 项）';
     const card=document.createElement('div');
     card.style.cssText='display:'+(archOpen?'block':'none')+';margin-top:8px;text-align:left;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:10px 12px';
     if(!doneCntAll){
