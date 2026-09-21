@@ -157,12 +157,12 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .vdel{position:absolute;right:3px;top:50%;transform:translateY(-50%);border:none;background:none;color:#d1d5db;font-size:11px;cursor:pointer;display:none;padding:2px 4px;line-height:1}
 .vrow:hover .vdel{display:block}
 .vdel:hover{color:#ef4444}
-.vstar{position:absolute;right:26px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:13px;color:#d1d5db;padding:2px 4px;line-height:1;z-index:2}
+.vstar{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;font-size:13px;color:#d1d5db;padding:2px 4px;line-height:1;z-index:2}
 .vstar:hover{color:#f59e0b}
 .vrow.starred{background:#f0fdf4}
 .vrow.starred>div:first-child{color:#166534}
 .vrow.starred .vstar{color:#f59e0b}
-.vword{cursor:pointer;transition:color .12s}
+.vrow .vword{position:relative;padding-right:34px;cursor:pointer;transition:color .12s}
 .vword:hover{color:#15803d;text-decoration:underline}
 .vword-editing{color:#15803d}
 .vnote{grid-column:1/-1;padding:2px 8px 8px;font-size:12px;color:#374151;background:#f9fafb;border-top:1px dashed #e5e7eb;cursor:pointer;line-height:1.55}
@@ -177,6 +177,10 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .vnote-save:hover{background:#16a34a}
 .vnote-clear{background:#fef2f2;color:#dc2626}
 .vnote-cancel{background:#e5e7eb;color:#374151}
+.done-chk{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;line-height:1.6;cursor:pointer;user-select:none;margin-left:6px;vertical-align:middle;background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db;transition:all .15s;flex:none}
+.done-chk:hover{border-color:#9ca3af}
+.done-chk.done{background:#22c55e;border-color:#22c55e;color:#fff}
+.rev-ops{display:inline-flex;align-items:center}
 .vadd{margin-top:12px;border:1.5px dashed #d1d5db;border-radius:10px;padding:10px;background:#f3f4f6}
 .vadd-t{font-size:12px;color:#4b5563;font-weight:700;margin-bottom:8px}
 .vrow2{display:flex;gap:6px;margin-bottom:6px}
@@ -1790,10 +1794,10 @@ function attachVocabRow(row){
   const w=row.querySelector(':scope > div:first-child');
   if(!w)return;
   w.classList.add('vword');w.title='点击添加 / 编辑该词的解释';
-  if(!row.querySelector('.vstar')){
+  if(!w.querySelector('.vstar')){
     const b=document.createElement('button');b.type='button';b.className='vstar';b.title='标记为重点单词（★）';
     b.textContent='☆';
-    row.appendChild(b);
+    w.appendChild(b);
   }
   applyRowV(row);
 }
@@ -2117,10 +2121,45 @@ function applyEditsAll(){
       b.type='button';b.className='ed-btn';b.textContent='✎ 编辑';b.title='编辑本知识点：可加粗 / 高亮 / 下划线 / 改颜色，保存后云端同步';
       b.onclick=e=>{e.stopPropagation();enterEdit(t);};
       sum.appendChild(b);
+      const dc=sum.querySelector('.done-chk');
+      if(dc)sum.appendChild(dc);
     }
   });
 }
 
+/* ===== 已掌握 / 已完成 打勾（知识点 + Assignment 卡片，云端同步） ===== */
+const DONE_KEY='com5104_done';
+let doneMap={};
+try{doneMap=JSON.parse(localStorage.getItem(DONE_KEY)||'{}');}catch(err){doneMap={};}
+function saveDone(){try{localStorage.setItem(DONE_KEY,JSON.stringify(doneMap));}catch(err){}schedulePush();}
+function setupDoneChk(sum,tid){
+  if(sum.querySelector('.done-chk'))return;
+  const d=document.createElement('span');
+  d.className='done-chk';d.title='我已掌握 / 已完成（点击标记，全设备同步）';
+  const ok=!!doneMap[tid];
+  d.classList.toggle('done',ok);
+  d.textContent=ok?'✓ 已掌握':'未掌握';
+  sum.appendChild(d);
+  /* 用捕获阶段拦截：点击「已掌握」胶囊绝不触发卡片展开/收起 */
+  sum.addEventListener('click',e=>{
+    const dd=e.target.closest('.done-chk');
+    if(!dd)return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(doneMap[tid])delete doneMap[tid];else doneMap[tid]=1;
+    const now=!!doneMap[tid];
+    d.classList.toggle('done',now);
+    d.textContent=now?'✓ 已掌握':'未掌握';
+    saveDone();
+  },true);
+}
+function applyDoneAll(){
+  document.querySelectorAll('.topic').forEach(t=>{
+    if(!t.dataset.tid)return;
+    const d=t.querySelector('.done-chk');
+    if(d){const ok=!!doneMap[t.dataset.tid];d.classList.toggle('done',ok);d.textContent=ok?'✓ 已掌握':'未掌握';}
+  });
+}
 /* 给所有知识点补折叠标记；给 Week 1-6 知识点注入 勾选框 + 加入按钮 */
 let extraSeq=0;
 function setupTopic(t,pg,tid){
@@ -2134,7 +2173,16 @@ function setupTopic(t,pg,tid){
     mk.className='mk';
     sum.appendChild(mk);
   }
-  if(!/^week\d+$/.test(pg.id))return;
+  if(!/^week\d+$/.test(pg.id)){
+    /* Assignment 等页：只加「已完成」打勾框 */
+    if(pg.id==='assignment'){
+      if(t.dataset.tid)return;
+      if(!tid)tid=pg.id+'-'+t.querySelector('.sum-txt').textContent.replace(/\s+/g,' ').trim().slice(0,40);
+      t.dataset.tid=tid;
+      setupDoneChk(sum,tid);
+    }
+    return;
+  }
   if(t.dataset.tid)return;
   if(!tid)tid=pg.id+'-x'+(extraSeq++);
   t.dataset.tid=tid;
@@ -2152,6 +2200,7 @@ function setupTopic(t,pg,tid){
   if(reviewList.includes(tid)){
     chk.checked=true;chk.disabled=true;inTag.style.display='inline-block';
   }
+  setupDoneChk(sum,tid);
 }
 document.querySelectorAll('.week-page').forEach(pg=>{
   pg.querySelectorAll('.topic').forEach((t,i)=>{
@@ -2295,7 +2344,7 @@ function syncReviewToggle(){
 function setSyncState(t){syncText=t;updateVmeta();}
 function schedulePush(){clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
 function pushToCloud(){
-  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta,vnotes:vocabNotes})})
+  fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta,vnotes:vocabNotes,done:doneMap})})
   .then(r=>r.ok?r.json():Promise.reject())
   .then(()=>setSyncState('☁ 已同步'))
   .catch(()=>setSyncState('⚠ 离线，改动暂存本机'));
@@ -2368,10 +2417,17 @@ async function loadFromCloud(){
         Object.keys(cloudVn).forEach(k=>{mergedVn[k]=cloudVn[k];});
         Object.keys(vocabNotes).forEach(k=>{mergedVn[k]=vocabNotes[k];});
         vocabNotes=mergedVn;
+        /* 已掌握打勾：合并云端 ∪ 本地（本地优先） */
+        const cloudDone=(d.done&&typeof d.done==='object')?d.done:{};
+        const mergedDone={};
+        Object.keys(cloudDone).forEach(k=>{mergedDone[k]=cloudDone[k];});
+        Object.keys(doneMap).forEach(k=>{mergedDone[k]=doneMap[k];});
+        doneMap=mergedDone;
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
         applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
         document.querySelectorAll('#vocab .vrow').forEach(applyRowV);
+        applyDoneAll();
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
         renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
@@ -2386,10 +2442,12 @@ async function loadFromCloud(){
         calEvents=Array.isArray(d.calendar)?d.calendar:[];
         imgMeta=(d.images&&typeof d.images==='object')?d.images:{};
         vocabNotes=(d.vnotes&&typeof d.vnotes==='object')?d.vnotes:{};
+        doneMap=(d.done&&typeof d.done==='object')?d.done:{};
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
         saveLocalAll();
         applyEditsAll();renderReview();renderExtras();renderExtraVocab();renderNotes();updateVmeta();
         document.querySelectorAll('#vocab .vrow').forEach(applyRowV);
+        applyDoneAll();
         topics.forEach(t=>{const tid=t.dataset.tid;if(!tid)return;if(reviewList.includes(tid))markAdded(tid);else unmarkAdded(tid);});
         renderImgsAll();calRender();syncImgCache();
         setSyncState('☁ 已同步');
@@ -2398,7 +2456,7 @@ async function loadFromCloud(){
         pushToCloud();
         setSyncState('☁ 已同步');
       }
-    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length||calEvents.length||Object.keys(imgMeta).length||Object.keys(vocabNotes).length){
+    }else if(reviewList.length||Object.keys(extraData).length||extraVocab.length||notes.length||calEvents.length||Object.keys(imgMeta).length||Object.keys(vocabNotes).length||Object.keys(doneMap).length){
       pushToCloud();
     }else{
       setSyncState('☁ 已同步');
@@ -2413,7 +2471,9 @@ function saveLocalAll(){
   try{localStorage.setItem(EDITS_KEY,JSON.stringify(edits));}catch(e){}
   try{localStorage.setItem(CAL_KEY,JSON.stringify(calEvents));}catch(e){}
   try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(e){}
+  try{localStorage.setItem(IMGS_KEY,JSON.stringify(imgMeta));}catch(e){}
   try{localStorage.setItem(VN_KEY,JSON.stringify(vocabNotes));}catch(e){}
+  try{localStorage.setItem(DONE_KEY,JSON.stringify(doneMap));}catch(e){}
 }
 /* ===== 课堂笔记（本地 + 云端同步） ===== */
 const NOTE_KEY='com5104_notes';
