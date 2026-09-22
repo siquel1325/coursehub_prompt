@@ -127,10 +127,13 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .note-add-row .note-tag-sel{padding:8px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:13px}
 .note-add button{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
 .note-add button:hover{background:#16a34a}
-.note-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:13px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-.note-body{flex:1;font-size:14px;line-height:1.7;color:#374151;white-space:pre-wrap;word-break:break-word}
-.note-time{flex:none;color:#9ca3af;font-size:12px;white-space:nowrap;padding-top:3px}
-.note-del{flex:none;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:2px 6px;border-radius:6px}
+.note-item{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:13px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.note-body{font-size:14px;line-height:1.7;color:#374151;white-space:pre-wrap;word-break:break-word;margin-bottom:8px}
+.note-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.note-time{color:#9ca3af;font-size:12px;white-space:nowrap}
+.note-edit{margin-left:auto;border:none;background:none;color:#64748b;cursor:pointer;font-size:12px;padding:2px 8px;border-radius:6px}
+.note-edit:hover{background:#f1f5f9;color:#16a34a}
+.note-del{border:none;background:none;color:#d1d5db;cursor:pointer;font-size:13px;padding:2px 6px;border-radius:6px}
 .note-del:hover{color:#ef4444;background:#fef2f2}
 /* ===== 批量加入悬浮条 ===== */
 .bulk-bar{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:50;display:none;align-items:center;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:999px;box-shadow:0 12px 34px rgba(0,0,0,.18);padding:10px 18px;font-size:14px;color:#374151}
@@ -238,10 +241,12 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .topic.editing .rev-ops{display:none}
 .note-edit{flex:none;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:6px}
 .note-edit:hover{color:#16a34a;background:#f0fdf4}
-.note-item.editing{border-color:#22c55e;flex-direction:column;align-items:stretch}
+.note-item.editing{border-color:#22c55e;display:flex;flex-direction:column;align-items:stretch}
 .note-item.editing .note-body{flex:1 1 auto;order:2;min-width:0}
 .note-item.editing .ed-toolbar{order:1;border-radius:10px 10px 0 0;position:static;top:auto}
+.note-item.editing .note-savebar{order:3}
 .note-item.editing .note-time,.note-item.editing .note-edit,.note-item.editing .note-del{display:none}
+.note-item.editing .note-meta{order:4}
 .note-item.editing .ed-toolbar .ed-save,.note-item.editing .ed-toolbar .ed-cancel,.note-item.editing .ed-toolbar .ed-reset,.note-item.editing .ed-sep{display:none}
 .note-savebar{order:3;display:flex;gap:8px;margin-top:8px}
 .note-savebar button{flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px}
@@ -2670,7 +2675,9 @@ function renderNotes(){
     ed.onclick=()=>enterNoteEdit(d,b,n);
     const del=document.createElement('button');del.className='note-del';del.type='button';del.textContent='✕';del.title='删除这条笔记';
     del.onclick=()=>{notes=notes.filter(x=>x.id!==n.id);saveNotes();renderNotes();};
-    d.appendChild(b);d.appendChild(tagEl);d.appendChild(t);d.appendChild(ed);d.appendChild(del);
+    const meta=document.createElement('div');meta.className='note-meta';
+    meta.appendChild(tagEl);meta.appendChild(t);meta.appendChild(ed);meta.appendChild(del);
+    d.appendChild(b);d.appendChild(meta);
     noteListEl.appendChild(d);
   });
   if(noteEmpty)noteEmpty.style.display=notes.length?'none':'block';
