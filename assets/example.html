@@ -1842,6 +1842,17 @@ try{extraVocab=JSON.parse(localStorage.getItem(VA_KEY)||'[]');}catch(err){extraV
 const VN_KEY='com5104_vocab_notes';
 let vocabNotes={};
 try{vocabNotes=JSON.parse(localStorage.getItem(VN_KEY)||'{}');}catch(err){vocabNotes={};}
+function migrateVnoteKeys(){
+  const out={};
+  Object.keys(vocabNotes).forEach(k=>{
+    const nk=String(k).toLowerCase().replace(/[\u2605\u2606\s]+\$/,'').trim();
+    const v=vocabNotes[k];
+    if(!out[nk]||(v.note&&!out[nk].note)||(v.star&&!out[nk].star)){
+      out[nk]=Object.assign({},out[nk]||{},v);
+    }
+  });
+  vocabNotes=out;
+}
 function saveVnotes(){try{localStorage.setItem(VN_KEY,JSON.stringify(vocabNotes));}catch(err){}schedulePush();}
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function saveVocab(){try{localStorage.setItem(VA_KEY,JSON.stringify(extraVocab));}catch(err){}schedulePush();}
@@ -1850,7 +1861,7 @@ function updateVmeta(s,n){
   const base=s?('匹配 '+n+' 词 / 共 '+all+' 词'):('共 '+all+' 词');
   vmeta.textContent=base+' · 滚轮滚动查看'+(syncText?(' · '+syncText):'');
 }
-function rowKey(row){const el=row&&row.querySelector('.vword');return el?el.textContent.trim().toLowerCase():'';}
+function rowKey(row){const el=row&&row.querySelector('.vword');return el?el.textContent.trim().toLowerCase().replace(/[\u2605\u2606\s]+\$/,'').trim():'';}
 function applyRowV(row){
   const k=rowKey(row);if(!k)return;
   const cur=vocabNotes[k]||{};
@@ -2512,6 +2523,7 @@ async function loadFromCloud(){
         Object.keys(cloudVn).forEach(k=>{mergedVn[k]=cloudVn[k];});
         Object.keys(vocabNotes).forEach(k=>{mergedVn[k]=vocabNotes[k];});
         vocabNotes=mergedVn;
+        migrateVnoteKeys();
         /* 已掌握打勾：合并云端 ∪ 本地（本地优先） */
         const cloudDone=(d.done&&typeof d.done==='object')?d.done:{};
         const mergedDone={};
@@ -2541,6 +2553,7 @@ async function loadFromCloud(){
         calEvents=Array.isArray(d.calendar)?d.calendar:[];
         imgMeta=(d.images&&typeof d.images==='object')?d.images:{};
         vocabNotes=(d.vnotes&&typeof d.vnotes==='object')?d.vnotes:{};
+        migrateVnoteKeys();
         doneMap=(d.done&&typeof d.done==='object')?d.done:{};
         plans=Array.isArray(d.plans)?d.plans:[];
         try{localStorage.setItem(SYNC_TS_KEY,String(d.v));}catch(e){}
