@@ -1845,7 +1845,7 @@ try{vocabNotes=JSON.parse(localStorage.getItem(VN_KEY)||'{}');}catch(err){vocabN
 function migrateVnoteKeys(){
   const out={};
   Object.keys(vocabNotes).forEach(k=>{
-    const nk=String(k).toLowerCase().replace(/[\u2605\u2606\s]+\$/,'').trim();
+    const nk=String(k).toLowerCase().replace(/[\u2605\u2606\s]+$/,'').trim();
     const v=vocabNotes[k];
     if(!out[nk]||(v.note&&!out[nk].note)||(v.star&&!out[nk].star)){
       out[nk]=Object.assign({},out[nk]||{},v);
@@ -1861,7 +1861,7 @@ function updateVmeta(s,n){
   const base=s?('匹配 '+n+' 词 / 共 '+all+' 词'):('共 '+all+' 词');
   vmeta.textContent=base+' · 滚轮滚动查看'+(syncText?(' · '+syncText):'');
 }
-function rowKey(row){const el=row&&row.querySelector('.vword');return el?el.textContent.trim().toLowerCase().replace(/[\u2605\u2606\s]+\$/,'').trim():'';}
+function rowKey(row){const el=row&&row.querySelector('.vword');return el?el.textContent.trim().toLowerCase().replace(/[\u2605\u2606\s]+$/,'').trim():'';}
 function applyRowV(row){
   const k=rowKey(row);if(!k)return;
   const cur=vocabNotes[k]||{};
@@ -2450,6 +2450,7 @@ function syncReviewToggle(){
 function setSyncState(t){syncText=t;updateVmeta();}
 function schedulePush(){clearTimeout(syncTimer);syncTimer=setTimeout(pushToCloud,800);}
 function pushToCloud(){
+  try{migrateVnoteKeys();}catch(e){}
   fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({review:reviewList,extra:extraData,vocab:extraVocab,notes:notes,edits:edits,calendar:calEvents,images:imgMeta,vnotes:vocabNotes,done:doneMap,plans:plans})})
   .then(r=>r.ok?r.json():Promise.reject())
   .then(()=>setSyncState('☁ 已同步'))
@@ -2566,6 +2567,8 @@ async function loadFromCloud(){
         setSyncState('☁ 已同步');
       }else{
         /* 本地较新或相同：以本地为准推回云端 —— 让「刚删除/刚添加」立即同步出去 */
+        try{migrateVnoteKeys();}catch(e){}
+        saveLocalAll();
         pushToCloud();
         setSyncState('☁ 已同步');
       }
