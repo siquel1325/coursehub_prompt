@@ -265,10 +265,19 @@
 1. 文件是单个 .html，grep 确认没有 <link rel=stylesheet、<script src=、<img src=http 等外部引用。
 2. 知识点卡片结构完整：每个 <details class="panel topic"> 都有 <summary> 和 <div class="body">，标签闭合。
 3. 左侧目录链接的 href="#xxx" 对应 <section id="xxx"> 存在（grep href="# 和 id=" 对一下）。
-4. 关键 JS 函数都在（grep 确认没被误删）：	oggleAll/enderReview/enderNotes/enderExtraVocab/
-   pplyRowV/enterEdit/uildToolbar/enderCal/enderPlans/pushToCloud/loadFromCloud/owKey。
+4. 关键 JS 函数都在（grep 确认没被误删）：	oggleAll/
+enderReview/
+enderNotes/
+enderExtraVocab/
+   pplyRowV/enterEdit/uildToolbar/
+enderCal/
+enderPlans/pushToCloud/loadFromCloud/
+owKey。
 5. 默认落地页：第一个 .week-page（Syllabus）的 style 不是 display:none，其他都是 display:none。
 6. 主题色：grep 确认主色值一致（如用户选蓝色，全文搜旧的 #22c55e 确认已全部替换）。
+7. **自动冒烟测试已内置**：模板末尾有一段 `<script>`，页面打开时自动检查 13 个关键元素和 9 个关键函数是否存在，
+   有缺失会在页面底部弹红条提示、并在 console 报错。你不用额外做什么——只要你没把模板那段 script 删掉就行
+   （grep 确认文件末尾有 `smoke test` 字样即可）。
 7. 内容一致性：知识点数量/顺序/标题与 PPT 一致；日期、百分比、人名与 Syllabus 一致。
 
 ### 不用做（模板已自带，别浪费时间）
