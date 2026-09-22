@@ -120,10 +120,12 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .rev-detail::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:999px}
 .rev-detail p{margin:6px 0}
 /* ===== 课堂笔记 ===== */
-.note-add{display:flex;gap:10px;margin-bottom:16px;align-items:flex-end}
-.note-add textarea{flex:1;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:14px;resize:vertical;min-height:64px;font-family:inherit;color:#1f2937;background:#fff;line-height:1.6}
+.note-add{margin-bottom:16px}
+.note-add textarea{width:100%;box-sizing:border-box;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;font-size:14px;resize:vertical;min-height:64px;font-family:inherit;color:#1f2937;background:#fff;line-height:1.6}
 .note-add textarea:focus{outline:none;border-color:#22c55e}
-.note-add button{background:#22c55e;color:#fff;border:none;border-radius:12px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.note-add-row{display:flex;gap:10px;margin-top:8px;align-items:center}
+.note-add-row .note-tag-sel{padding:8px;border:1px solid #ddd;border-radius:8px;background:#fff;font-size:13px}
+.note-add button{background:#22c55e;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
 .note-add button:hover{background:#16a34a}
 .note-item{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:13px 16px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
 .note-body{flex:1;font-size:14px;line-height:1.7;color:#374151;white-space:pre-wrap;word-break:break-word}
@@ -236,7 +238,15 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 .topic.editing .rev-ops{display:none}
 .note-edit{flex:none;border:none;background:none;color:#d1d5db;cursor:pointer;font-size:12px;padding:2px 6px;border-radius:6px}
 .note-edit:hover{color:#16a34a;background:#f0fdf4}
-.note-item.editing{border-color:#22c55e}
+.note-item.editing{border-color:#22c55e;flex-direction:column;align-items:stretch}
+.note-item.editing .note-body{flex:1 1 auto;order:2;min-width:0}
+.note-item.editing .ed-toolbar{order:1;border-radius:10px 10px 0 0;position:static;top:auto}
+.note-item.editing .note-time,.note-item.editing .note-edit,.note-item.editing .note-del{display:none}
+.note-item.editing .ed-toolbar .ed-save,.note-item.editing .ed-toolbar .ed-cancel,.note-item.editing .ed-toolbar .ed-reset,.note-item.editing .ed-sep{display:none}
+.note-savebar{order:3;display:flex;gap:8px;margin-top:8px}
+.note-savebar button{flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px}
+.note-savebar .ns-save{background:#22c55e;color:#fff}
+.note-savebar .ns-cancel{background:#f1f5f9;color:#334155}
 .ed-body{flex:1 1 100%;outline:2px solid #22c55e;outline-offset:-2px;border-radius:8px;padding:8px 10px;min-height:44px;cursor:text;background:#fff}
 /* ===== 日程安排（中间主区大日历） ===== */
 .cal{margin-top:4px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:18px 20px}
@@ -1506,7 +1516,20 @@ mark.hl{background:#22c55e;color:#fff;border-radius:4px;padding:0 3px;font-weigh
 </div>
 <div class="note-add">
 <textarea id="note-input" placeholder="写点什么…（Ctrl / ⌘ + Enter 快速添加）" rows="2"></textarea>
+<div class="note-add-row">
+<select id="note-tag" class="note-tag-sel">
+<option value="general">📌 通用</option>
+<option value="week1">Week 1</option>
+<option value="week2">Week 2</option>
+<option value="week3">Week 3</option>
+<option value="week4">Week 4</option>
+<option value="week5">Week 5</option>
+<option value="week6">Week 6</option>
+<option value="assignment">📌 Assignment</option>
+<option value="exam">🎯 考试复习</option>
+</select>
 <button id="note-btn" type="button">添加笔记</button>
+</div>
 </div>
 <div id="note-list"></div>
 <div id="note-empty" class="empty" style="display:block">还没有笔记，写下第一条吧。</div>
@@ -2619,9 +2642,16 @@ function enterNoteEdit(d,b,n){
       b.contentEditable='false';b.classList.remove('ed-body');d.classList.remove('editing');
       if(tb._closeAll)document.removeEventListener('click',tb._closeAll);
       tb.remove();
+      const sb=d.querySelector('.note-savebar');if(sb)sb.remove();
     }
   });
   d.insertBefore(tb,b.nextSibling);
+  /* 笔记编辑：工具栏里的保存/取消已隐藏，改为输入框下方全宽条 */
+  const savebar=document.createElement('div');savebar.className='note-savebar';
+  savebar.innerHTML='<button type="button" class="ns-cancel">取消</button><button type="button" class="ns-save">保存笔记</button>';
+  d.insertBefore(savebar,b.nextSibling);
+  savebar.querySelector('.ns-save').onclick=()=>{tb.querySelector('.ed-save').click();};
+  savebar.querySelector('.ns-cancel').onclick=()=>{tb.querySelector('.ed-cancel').click();};
   b.focus();
 }
 function renderNotes(){
@@ -2632,22 +2662,27 @@ function renderNotes(){
     d.className='note-item';
     const b=document.createElement('div');b.className='note-body';
     b.innerHTML=n.html||escapeHtml(n.text||'');
+    const tagInfo=NOTE_TAGS[n.tag]||NOTE_TAGS.general;
+    const tagEl=document.createElement('span');tagEl.className='note-tag';tagEl.textContent=tagInfo[0];
+    tagEl.style.cssText='display:inline-block;background:'+tagInfo[1]+'1a;color:'+tagInfo[1]+';border:1px solid '+tagInfo[1]+'55;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;margin-right:6px';
     const t=document.createElement('time');t.className='note-time';t.textContent=n.time;
     const ed=document.createElement('button');ed.className='note-edit';ed.type='button';ed.textContent='✎ 编辑';ed.title='编辑这条笔记：可加粗 / 高亮 / 下划线 / 改颜色';
     ed.onclick=()=>enterNoteEdit(d,b,n);
     const del=document.createElement('button');del.className='note-del';del.type='button';del.textContent='✕';del.title='删除这条笔记';
     del.onclick=()=>{notes=notes.filter(x=>x.id!==n.id);saveNotes();renderNotes();};
-    d.appendChild(b);d.appendChild(t);d.appendChild(ed);d.appendChild(del);
+    d.appendChild(b);d.appendChild(tagEl);d.appendChild(t);d.appendChild(ed);d.appendChild(del);
     noteListEl.appendChild(d);
   });
   if(noteEmpty)noteEmpty.style.display=notes.length?'none':'block';
   if(noteCount)noteCount.textContent=notes.length?('· '+notes.length+' 条'):'';
 }
+const NOTE_TAGS={general:['📌 通用','#64748b'],week1:['Week 1','#2563eb'],week2:['Week 2','#16a34a'],week3:['Week 3','#d97706'],week4:['Week 4','#7c3aed'],week5:['Week 5','#dc2626'],week6:['Week 6','#0891b2'],assignment:['📌 Assignment','#db2777'],exam:['🎯 考试','#9333ea']};
 function addNote(){
   const text=noteInput.value.trim();
   if(!text){noteInput.focus();return;}
   const html=escapeHtml(text).replace(/\n/g,'<br>');
-  notes.push({id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:text,html:html,time:new Date().toLocaleString('zh-CN',{hour12:false})});
+  const tag=(document.getElementById('note-tag')||{}).value||'general';
+  notes.push({id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:text,html:html,time:new Date().toLocaleString('zh-CN',{hour12:false}),tag:tag});
   noteInput.value='';
   saveNotes();renderNotes();
 }
@@ -3161,6 +3196,129 @@ renderMiniCal();
     }
   };
   close.onclick=()=>panel.classList.remove('open');
+  /* 点面板外任意位置关闭 */
+  document.addEventListener('click',e=>{
+    if(!panel.classList.contains('open'))return;
+    if(panel.contains(e.target)||fab.contains(e.target))return;
+    panel.classList.remove('open');
+  });
+})();
+</script>
+<!-- ===== 浮动快捷按钮（可收起横条） ===== -->
+<style>
+.float-rail{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:60;
+  background:rgba(15,15,15,.7);border:1px solid rgba(255,255,255,.15);border-bottom:none;border-radius:12px 12px 0 0;
+  box-shadow:0 -4px 16px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;
+  min-width:300px;transition:all .2s}
+.float-rail.collapsed .rail-body{display:none}
+.rail-toggle{width:100%;border:none;background:transparent;padding:4px;cursor:pointer;color:#fff;font-size:12px;
+  display:flex;justify-content:center;align-items:center;gap:6px;font-weight:600}
+.rail-toggle:hover{background:rgba(255,255,255,.1)}
+.rail-body{display:flex;gap:10px;padding:10px 14px 12px;width:100%;box-sizing:border-box}
+.rail-btn{flex:1;border:1px solid #e5e7eb;border-radius:10px;padding:9px 12px;font-size:13px;font-weight:700;
+  cursor:pointer;background:#f9fafb;color:#334155;transition:all .15s}
+.rail-btn:hover{border-color:#22c55e;color:#16a34a;background:#f0fdf4}
+.rail-btn.primary{background:#22c55e;color:#fff;border-color:#22c55e}
+.rail-btn.primary:hover{background:#16a34a;color:#fff}
+.float-note-panel{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:61;width:340px;
+  background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:14px;display:none}
+.float-note-panel.show{display:block}
+.float-note-panel h4{margin:0 0 8px;font-size:14px}
+.float-note-panel textarea{width:100%;min-height:90px;border:1px solid #ddd;border-radius:8px;padding:8px;
+  font:inherit;font-size:13px;resize:vertical;box-sizing:border-box}
+.float-note-panel .fn-btns{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.float-note-panel .fn-hint{font-size:11px;color:#999}
+.float-note-panel .fn-save{background:#22c55e;color:#fff;border:none;border-radius:8px;padding:6px 14px;cursor:pointer;font-weight:700}
+</style>
+<div class="float-rail collapsed" id="float-rail">
+  <button class="rail-toggle" id="rail-toggle" type="button">▲ <span id="rail-toggle-txt">更多小工具</span></button>
+  <div class="rail-body">
+    <button class="rail-btn" id="float-toggle" type="button">全部展开</button>
+    <button class="rail-btn primary" id="float-note-open" type="button">记笔记</button>
+  </div>
+</div>
+<div class="float-note-panel" id="float-note-panel">
+  <h4>快速记笔记</h4>
+  <select id="float-note-tag" class="note-tag-sel" style="width:100%;margin-bottom:8px;padding:6px;border:1px solid #ddd;border-radius:6px">
+    <option value="general">📌 通用</option>
+    <option value="week1">Week 1</option>
+    <option value="week2">Week 2</option>
+    <option value="week3">Week 3</option>
+    <option value="week4">Week 4</option>
+    <option value="week5">Week 5</option>
+    <option value="week6">Week 6</option>
+    <option value="assignment">📌 Assignment</option>
+    <option value="exam">🎯 考试复习</option>
+  </select>
+  <textarea id="float-note-input" placeholder="写下想法…（Ctrl/⌘+Enter 保存）"></textarea>
+  <div class="fn-btns">
+    <span class="fn-hint">自动同步到笔记页</span>
+    <button class="fn-save" id="float-note-save" type="button">保存</button>
+  </div>
+</div>
+<script>
+(function(){
+  const rail=document.getElementById('float-rail');
+  const railToggle=document.getElementById('rail-toggle');
+  const railToggleTxt=document.getElementById('rail-toggle-txt');
+  railToggle.onclick=()=>{
+    rail.classList.toggle('collapsed');
+    const c=rail.classList.contains('collapsed');
+    railToggleTxt.textContent='更多小工具';
+    railToggle.firstChild.textContent=c?'▲ ':'▼ ';
+  };
+  const ft=document.getElementById('float-toggle');
+  const pages=[...document.querySelectorAll('.week-page')];
+  function currentPage(){return pages.find(p=>p.style.display!=='none')||pages[0];}
+  function syncFloat(){
+    const pg=currentPage();if(!pg||!ft)return;
+    const ts=pg.querySelectorAll('.topic');
+    if(!ts.length){ft.style.display='none';return;}
+    ft.style.display='block';
+    const all=[...ts].every(t=>t.open);
+    ft.textContent=all?'全部收起':'全部展开';
+  }
+  ft&&ft.addEventListener('click',()=>{
+    const pg=currentPage();if(!pg)return;
+    const ts=pg.querySelectorAll('.topic');
+    const all=[...ts].every(t=>t.open);
+    ts.forEach(t=>t.open=!all);
+    syncFloat();
+  });
+  new MutationObserver(syncFloat).observe(document.body,{subtree:true,attributes:true,attributeFilter:['open','style']});
+  setInterval(syncFloat,1500);
+  syncFloat();
+
+  const openBtn=document.getElementById('float-note-open');
+  const panel=document.getElementById('float-note-panel');
+  const inp=document.getElementById('float-note-input');
+  const save=document.getElementById('float-note-save');
+  openBtn&&openBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    panel.classList.toggle('show');
+    if(panel.classList.contains('show'))inp.focus();
+  });
+  function doSave(){
+    const v=inp.value.trim();if(!v)return;
+    const html=v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    const tag=(document.getElementById('float-note-tag')||{}).value||'general';
+    const n={id:'n'+Date.now()+Math.random().toString(36).slice(2,6),text:v,html:html,
+      time:new Date().toLocaleString('zh-CN',{hour12:false}),tag:tag};
+    if(typeof notes!=='undefined'&&typeof saveNotes==='function'){
+      notes.push(n);saveNotes();
+      if(typeof renderNotes==='function')renderNotes();
+    }
+    inp.value='';panel.classList.remove('show');
+  }
+  save&&save.addEventListener('click',doSave);
+  inp&&inp.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();doSave();}
+  });
+  document.addEventListener('click',e=>{
+    if(!panel.classList.contains('show'))return;
+    if(panel.contains(e.target)||openBtn.contains(e.target))return;
+    panel.classList.remove('show');
+  });
 })();
 </script>
 </body>
